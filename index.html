@@ -147,6 +147,8 @@
   .teach warn{background:rgba(255,59,48,.12); border-left-color:var(--danger);}
   .teach warn:before{content:'⚠️ ';}
   .teach formula{display:block; margin:8px 0; padding:12px; text-align:center; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:13px; color:var(--accent); background:rgba(0,122,255,.10); background:color-mix(in srgb, var(--accent) 11%, transparent); border-radius:10px;}
+  .tcard{background:var(--panel); border:.5px solid var(--line); border-radius:14px; padding:14px; margin-bottom:10px; box-shadow:var(--shadow);}
+  .tcard-h{background:rgba(0,122,255,.12); background:color-mix(in srgb, var(--accent) 12%, transparent); border-radius:9px; padding:9px 12px; font-weight:800; color:var(--accent); font-size:13.5px; margin-bottom:8px;}
   .dgx{margin:10px 0; padding:12px; background:var(--panel); border-radius:12px; border:.5px solid var(--line);}
   .dg-title{font-size:12px; font-weight:800; color:var(--accent); margin-bottom:8px;}
   .dg-row{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:5px 0;}
@@ -885,6 +887,17 @@ const DIAGRAMS={
 };
 function teachHtml(s){ return String(s).replace(/<diagram\s+id="([^"]+)"\s*\/>/g, '<div class="dgx" data-dg="$1"></div>'); }
 function renderDiagrams(){ document.querySelectorAll('.dgx[data-dg]').forEach(el=>{ el.innerHTML=DIAGRAMS[el.getAttribute('data-dg')]||''; }); }
+function renderTeachCards(html){
+  const s=String(html);
+  if(!/<h4>/.test(s)) return '<div class="teach tcard">'+teachHtml(s)+'</div>';
+  const parts=s.split(/(?=<h4>)/);
+  return parts.map(seg=>{
+    const m=seg.match(/^\s*<h4>([\s\S]*?)<\/h4>([\s\S]*)$/);
+    if(m) return '<div class="teach tcard"><div class="tcard-h">'+m[1]+'</div>'+teachHtml(m[2])+'</div>';
+    const b=seg.trim();
+    return b ? '<div class="teach tcard">'+teachHtml(b)+'</div>' : '';
+  }).join('');
+}
 
 /* ==================== 测验选项打乱 ==================== */
 let quizOrder={};
@@ -1105,7 +1118,7 @@ function viewDetail(id){
       <div><div class="tt">Lv${lv.id} ${lv.title}</div><div class="ts">${lv.sub}</div></div>
     </div>
     <h2 class="sec">📖 知识点讲解</h2>
-    <div class="teach">${teachHtml(lv.teach)}</div>
+    ${renderTeachCards(lv.teach)}
     <h2 class="sec">✅ 任务清单</h2>
     <div class="card" style="padding:4px 14px">${tasks}</div>
     ${done?`<div class="result good" style="font-size:14px">🎉 本关任务已完成${qdone?'':',再做个测验更扎实'}</div>`:''}
@@ -1306,7 +1319,8 @@ function viewArticle(id){
       <button class="back" id="backBtn">‹</button>
       <div><div class="tt">${found.it.t}</div><div class="ts">${found.cat.icon} ${found.cat.name}</div></div>
     </div>
-    <div class="teach" style="margin-top:6px">${teachHtml(found.it.body)}</div>
+    <div style="height:6px"></div>
+    ${renderTeachCards(found.it.body)}
     <div style="height:20px"></div>
   </div>`;
 }
