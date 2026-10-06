@@ -126,6 +126,7 @@
       background:linear-gradient(var(--bg), var(--bg-fade) 70%, transparent); z-index:5;}
   .back{background:var(--panel2); border:1px solid var(--line); color:var(--txt); width:38px; height:38px;
       border-radius:10px; font-size:18px; flex:0 0 38px;}
+  .gearbtn{background:var(--panel3); color:var(--accent); width:40px; height:40px; border-radius:12px; font-size:19px; flex:0 0 40px; cursor:pointer;}
   .topbar .tt{font-size:16px; font-weight:800;}
   .topbar .ts{font-size:11.5px; color:var(--sub);}
   .teach{background:var(--panel3); border:none; border-radius:12px; padding:14px;
@@ -966,6 +967,7 @@ function setTabs(){
   let active = view;
   if(view==='detail'||view==='quiz') active='map';
   else if(view==='article') active='kb';
+  else if(view==='settings') active='home';
   document.querySelectorAll('.tabbar button').forEach(b=> b.classList.toggle('on', b.dataset.tab===active));
 }
 
@@ -981,6 +983,7 @@ function render(){
   else if(view==='records') el.innerHTML=viewRecords();
   else if(view==='kb') el.innerHTML=viewKnowledge();
   else if(view==='article') el.innerHTML=viewArticle(viewParam);
+  else if(view==='settings') el.innerHTML=viewSettings();
   setTabs();
   wire();
   const after = rankIndex(totalXP());
@@ -1002,7 +1005,10 @@ function viewHome(){
   return `
   <div class="wrap">
     <div class="hero">
-      <div class="t">⚡ 电气工程师养成<small>从装配电工 → 电气工程师</small></div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div class="t">⚡ 电气工程师养成<small>从装配电工 → 电气工程师</small></div>
+        <button class="gearbtn" data-go="settings" title="设置">⚙️</button>
+      </div>
       <div class="rank-row">
         <div class="rank-icon">${rank.icon}</div>
         <div style="flex:1">
@@ -1038,12 +1044,35 @@ function viewHome(){
       </div>
     </div>
 
-    <h2 class="sec">设置</h2>
+    <div class="muted center" style="font-size:11px;margin-top:18px">数据存在本机 · 换设备用"导出/导入"</div>
+  </div>`;
+}
+
+/* -------- 设置页 -------- */
+function viewSettings(){
+  return `<div class="wrap">
+    <div class="topbar">
+      <button class="back" id="backBtn">‹</button>
+      <div><div class="tt">设置</div><div class="ts">外观 · 提醒 · 存档</div></div>
+    </div>
+
+    <h2 class="sec">🎨 外观</h2>
+    <div class="card" style="padding:16px;margin-bottom:10px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:12px">配色方案</div>
+      <div class="palrow">
+        ${PALETTES.map(p=>`<button class="pchip ${((state.settings.palette||'blue')===p[0])?'on':''}" data-pal="${p[0]}" style="background:${p[2]}" title="${p[1]}"></button>`).join('')}
+      </div>
+      <div class="muted" style="font-size:11.5px;margin-top:10px">当前配色:${(PALETTES.find(p=>p[0]===(state.settings.palette||'blue'))||PALETTES[0])[1]}</div>
+    </div>
     <div class="card" style="padding:4px 16px">
-      <label class="setrow">
+      <label class="setrow" style="border-bottom:none">
         <div><div class="st">🌗 深色模式</div></div>
         <span class="switch"><input type="checkbox" id="toggleTheme" ${state.settings.theme==='dark'?'checked':''}><span></span></span>
       </label>
+    </div>
+
+    <h2 class="sec">🔔 提醒</h2>
+    <div class="card" style="padding:4px 16px">
       <label class="setrow">
         <div><div class="st">🔊 音效</div></div>
         <span class="switch"><input type="checkbox" id="toggleSound" ${state.settings.sound?'checked':''}><span></span></span>
@@ -1054,15 +1083,7 @@ function viewHome(){
       </label>
     </div>
 
-    <h2 class="sec">配色方案</h2>
-    <div class="card" style="padding:16px">
-      <div class="palrow">
-        ${PALETTES.map(p=>`<button class="pchip ${((state.settings.palette||'blue')===p[0])?'on':''}" data-pal="${p[0]}" style="background:${p[2]}" title="${p[1]}"></button>`).join('')}
-      </div>
-      <div class="muted" style="font-size:11.5px;margin-top:10px">当前配色:${(PALETTES.find(p=>p[0]===(state.settings.palette||'blue'))||PALETTES[0])[1]}</div>
-    </div>
-
-    <h2 class="sec">存档</h2>
+    <h2 class="sec">💾 存档</h2>
     <div class="row" style="gap:8px">
       <button class="btn ghost" style="flex:1" id="exportBtn">⬇ 导出存档</button>
       <button class="btn ghost" style="flex:1" id="importBtn">⬆ 导入存档</button>
@@ -1070,6 +1091,7 @@ function viewHome(){
     </div>
     <input type="file" id="fileInput" accept=".json" style="display:none">
     <div class="muted center" style="font-size:11px;margin-top:18px">数据存在本机 · 换设备用"导出/导入"</div>
+    <div style="height:10px"></div>
   </div>`;
 }
 
@@ -1347,7 +1369,7 @@ function wire(){
     if(kc) kc.addEventListener('click', ()=>{ kbQuery=''; kb.value=''; kb.focus(); refreshKbList(); });
   }
   const back=document.getElementById('backBtn');
-  if(back) back.addEventListener('click', ()=> go(view==='quiz'?'detail':(view==='article'?'kb':'map'), viewParam));
+  if(back) back.addEventListener('click', ()=> go(view==='quiz'?'detail':(view==='article'?'kb':(view==='settings'?'home':'map')), viewParam));
 
   // 任务点击
   document.querySelectorAll('[data-task]').forEach(el=>{
