@@ -1,0 +1,1516 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#f2f2f7">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>电气工程师养成</title>
+<style>
+:root{
+    --bg:#f2f2f7; --panel:#ffffff; --panel2:#f2f2f7; --panel3:#e9e9ef;
+    --line:rgba(60,60,67,.14); --sep:rgba(60,60,67,.10);
+    --txt:#1c1c1e; --sub:#8e8e93;
+    --accent:#007aff; --accent2:#34c759; --gold:#ff9500; --danger:#ff3b30; --purple:#af52de;
+    --shadow:0 1px 2px rgba(0,0,0,.04), 0 6px 20px rgba(0,0,0,.05);
+    --tabbar-bg:rgba(255,255,255,.86);
+    --bg-fade:rgba(242,242,247,.85);
+  }
+  :root[data-theme="dark"]{
+    --bg:#000000; --panel:#1c1c1e; --panel2:#2c2c2e; --panel3:#3a3a3c;
+    --line:rgba(255,255,255,.14); --sep:rgba(255,255,255,.10);
+    --txt:#ffffff; --sub:#98989f;
+    --accent:#0a84ff; --accent2:#30d158; --gold:#ff9f0a; --danger:#ff453a; --purple:#bf5af2;
+    --shadow:none;
+    --tabbar-bg:rgba(28,28,30,.82);
+    --bg-fade:rgba(0,0,0,.85);
+  }
+  *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+  html,body{margin:0; padding:0; height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC","Helvetica Neue","Microsoft YaHei",sans-serif;
+    line-height:1.5; overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  #view{position:absolute; inset:0 0 62px 0; overflow-y:auto; -webkit-overflow-scrolling:touch;}
+  .wrap{max-width:720px; margin:0 auto; padding:16px 14px 30px;}
+
+  /* ==== 底部导航 ==== */
+  .tabbar{
+    position:fixed; left:0; right:0; bottom:0; height:62px; z-index:20;
+    background:var(--tabbar-bg); backdrop-filter:blur(20px) saturate(180%); -webkit-backdrop-filter:blur(20px) saturate(180%);
+    border-top:.5px solid var(--line); display:flex;
+    padding-bottom:env(safe-area-inset-bottom);
+  }
+  .tabbar button{
+    flex:1; background:none; border:none; color:var(--sub); font-family:inherit;
+    font-size:11px; font-weight:600; display:flex; flex-direction:column; align-items:center;
+    justify-content:center; gap:3px; cursor:pointer; padding:0;
+  }
+  .tabbar button .ic{font-size:20px; line-height:1; filter:grayscale(1) opacity(.6);}
+  .tabbar button.on{color:var(--accent);}
+  .tabbar button.on .ic{filter:none;}
+
+  /* ==== 通用 ==== */
+  h2.sec{font-size:13px; color:var(--sub); margin:20px 4px 8px; font-weight:700; letter-spacing:.5px;}
+  .card{background:var(--panel); border:.5px solid var(--line); border-radius:16px; margin-bottom:12px; overflow:hidden; box-shadow:var(--shadow);}
+  button{font-family:inherit; cursor:pointer; border:none; border-radius:10px; font-weight:700;}
+  .btn{background:var(--accent); color:#fff; padding:12px 16px; font-size:15px; border-radius:12px; font-weight:600;}
+  .btn.wide{display:block; width:100%;}
+  .btn.ghost{background:var(--panel3); color:var(--accent); border:none;}
+  .switch{position:relative; display:inline-block; width:51px; height:31px; flex:0 0 auto;}
+  .switch input{display:none;}
+  .switch span{position:absolute; inset:0; background:#d9d9de; border-radius:31px; transition:.25s; cursor:pointer;}
+  .switch span::before{content:''; position:absolute; width:27px; height:27px; left:2px; top:2px; background:#fff; border-radius:50%; transition:.25s; box-shadow:0 2px 4px rgba(0,0,0,.18);}
+  .switch input:checked + span{background:var(--accent2);}
+  .switch input:checked + span::before{transform:translateX(20px);}
+  :root[data-theme="dark"] .switch span{background:#48484a;}
+  .setrow{display:flex; align-items:center; justify-content:space-between; padding:13px 0; border-bottom:.5px solid var(--sep); cursor:pointer;}
+  .setrow .st{font-size:15px;}
+  .setrow .ss{font-size:12px; color:var(--sub); margin-top:2px;}
+  .kbsearch{display:flex; align-items:center; gap:8px; background:var(--panel); border:.5px solid var(--line); border-radius:12px; padding:10px 12px; box-shadow:var(--shadow);}
+  .kbsearch input{flex:1; min-width:0; border:none; background:transparent; color:var(--txt); font-size:15px; font-family:inherit; outline:none;}
+  .kbsearch > span{color:var(--sub);}
+  .kbsearch button{background:var(--panel3); color:var(--sub); width:24px; height:24px; border-radius:50%; font-size:12px; padding:0; flex:0 0 auto;}
+  .kbrow{display:flex; align-items:center; justify-content:space-between; gap:10px; padding:12px 0; border-bottom:.5px solid var(--sep); cursor:pointer;}
+  .kbrow:last-child{border-bottom:none;}
+  .kbrow .kbt{font-size:14.5px;}
+  .kbrow .kbc{font-size:11.5px; color:var(--sub); flex:0 0 auto;}
+  .btn:disabled{opacity:.5; cursor:default;}
+  .row{display:flex; align-items:center; gap:10px;}
+  .bar{height:8px; border-radius:4px; background:var(--panel3); overflow:hidden; border:none;}
+  .bar > i{display:block; height:100%; width:0; border-radius:6px; background:linear-gradient(90deg,var(--accent),var(--accent2)); transition:width .5s ease;}
+  .muted{color:var(--sub);}
+  .center{text-align:center;}
+
+  /* ==== 主页 战力面板 ==== */
+  .hero{
+    background:var(--panel);
+    border:.5px solid var(--line); border-radius:20px; padding:20px;
+    box-shadow:var(--shadow);
+  }
+  .hero .t{font-size:19px; font-weight:800;}
+  .hero .t small{display:block; color:var(--sub); font-weight:500; font-size:12px; margin-top:3px;}
+  .rank-row{display:flex; align-items:center; gap:12px; margin-top:16px;}
+  .rank-icon{font-size:38px;}
+  .rank-name{font-size:20px; font-weight:700; color:var(--txt); letter-spacing:-.4px;}
+  .rank-sub{font-size:12px; color:var(--sub); margin-top:2px;}
+  .stat-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:14px;}
+  .stat{background:var(--panel3); border:none; border-radius:12px; padding:10px 8px; text-align:center;}
+  .stat b{display:block; font-size:18px; color:var(--txt);}
+  .stat span{font-size:11px; color:var(--sub);}
+  .today-tip{
+    margin-top:14px; padding:13px 15px; border-radius:14px; font-size:13.5px;
+    background:rgba(0,122,255,.12); background:color-mix(in srgb, var(--accent) 13%, transparent); border:none; color:var(--txt);
+  }
+  .today-tip b{color:var(--accent);}
+
+  /* ==== 关卡卡片 ==== */
+  .tier-label{margin:20px 4px 8px; font-size:12px; color:var(--sub); font-weight:700;}
+  .lv{background:var(--panel); border:1px solid var(--line); border-left:4px solid var(--line);
+      border-radius:14px; margin-bottom:10px; display:flex; align-items:center; gap:12px; padding:13px 14px; cursor:pointer;}
+  .lv.locked{opacity:.5; cursor:default;}
+  .lv-badge{width:42px; height:42px; flex:0 0 42px; border-radius:11px; display:flex; align-items:center;
+      justify-content:center; font-weight:700; font-size:15px; background:var(--panel3); border:none;}
+  .lv .info{flex:1; min-width:0;}
+  .lv .info .t{font-size:14.5px; font-weight:700;}
+  .lv .info .s{font-size:11.5px; color:var(--sub); margin:2px 0 6px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+  .mini-bar{height:5px; border-radius:3px; background:var(--panel3); overflow:hidden;}
+  .mini-bar > i{display:block; height:100%; width:0; background:var(--accent2); transition:width .4s;}
+  .pass-tag{font-size:10px; color:#06110a; background:var(--accent2); padding:2px 7px; border-radius:20px; font-weight:800; margin-left:6px;}
+
+  /* ==== 详情页 ==== */
+  .topbar{display:flex; align-items:center; gap:10px; padding:14px 4px 6px; position:sticky; top:0;
+      background:linear-gradient(var(--bg), var(--bg-fade) 70%, transparent); z-index:5;}
+  .back{background:var(--panel2); border:1px solid var(--line); color:var(--txt); width:38px; height:38px;
+      border-radius:10px; font-size:18px; flex:0 0 38px;}
+  .topbar .tt{font-size:16px; font-weight:800;}
+  .topbar .ts{font-size:11.5px; color:var(--sub);}
+  .teach{background:var(--panel3); border:none; border-radius:12px; padding:14px;
+      font-size:13.5px; color:var(--txt); line-height:1.75;}
+  .teach h4{margin:14px 0 6px; color:var(--accent); font-size:13.5px;}
+  .teach h4:first-child{margin-top:0;}
+  .teach b{color:var(--txt);}
+  .teach code{background:var(--panel); padding:1px 6px; border-radius:5px; color:var(--accent); font-size:12.5px;}
+  .teach ul{margin:4px 0; padding-left:20px;}
+  .teach ol{margin:4px 0; padding-left:20px;}
+  .teach p{margin:8px 0;}
+  .teach p:first-child{margin-top:0;}
+  .teach li{margin:3px 0;}
+  .teach tip,.teach warn,.teach key{display:block; margin:8px 0; padding:10px 12px; border-radius:10px; font-size:12.5px; line-height:1.7; border-left:4px solid var(--accent);}
+  .teach tip{background:rgba(52,199,89,.13); background:color-mix(in srgb, var(--accent2) 14%, transparent); border-left-color:var(--accent2);}
+  .teach tip:before{content:'💡 ';}
+  .teach key{background:rgba(0,122,255,.12); background:color-mix(in srgb, var(--accent) 13%, transparent); border-left-color:var(--accent);}
+  .teach key:before{content:'🔑 ';}
+  .teach warn{background:rgba(255,59,48,.12); border-left-color:var(--danger);}
+  .teach warn:before{content:'⚠️ ';}
+  .teach formula{display:block; margin:8px 0; padding:12px; text-align:center; font-family:ui-monospace,Menlo,Consolas,monospace; font-weight:700; font-size:13px; color:var(--accent); background:rgba(0,122,255,.10); background:color-mix(in srgb, var(--accent) 11%, transparent); border-radius:10px;}
+  .dgx{margin:10px 0; padding:12px; background:var(--panel); border-radius:12px; border:.5px solid var(--line);}
+  .dg-title{font-size:12px; font-weight:800; color:var(--accent); margin-bottom:8px;}
+  .dg-row{display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:5px 0;}
+  .dg-chip{display:inline-block; padding:5px 10px; border-radius:8px; background:var(--panel3); font-size:12px; font-weight:600;}
+  .dg-chip.hl{background:rgba(0,122,255,.16); background:color-mix(in srgb, var(--accent) 16%, transparent); color:var(--accent);}
+  .dg-arrow{color:var(--sub); font-weight:800;}
+  .dg-cap{font-size:11px; color:var(--sub); margin-top:5px; line-height:1.6;}
+  .dg-vert{color:var(--sub); font-weight:800; margin:2px 0 2px 6px;}
+  .palrow{display:flex; gap:14px; overflow-x:auto; padding:4px 0; align-items:center;}
+  .pchip{width:38px; height:38px; flex:0 0 38px; border-radius:50%; border:none; cursor:pointer;}
+  .pchip.on{outline:3px solid var(--txt); outline-offset:2px;}
+  .task{display:flex; align-items:flex-start; gap:10px; padding:11px 4px; border-bottom:.5px solid var(--sep); cursor:pointer;}
+  .task:last-child{border-bottom:none;}
+  .task .box{width:22px; height:22px; flex:0 0 22px; border-radius:6px; border:2px solid var(--sub);
+      display:flex; align-items:center; justify-content:center; margin-top:1px; font-size:13px; color:transparent; transition:.15s;}
+  .task.done .box{background:var(--accent2); border-color:var(--accent2); color:#06110a;}
+  .task .txt{flex:1; font-size:13.5px;}
+  .task.done .txt{color:var(--sub); text-decoration:line-through;}
+  .tag{font-size:10px; padding:1px 7px; border-radius:5px; margin-right:6px; font-weight:700;}
+  .tag.x{background:rgba(0,122,255,.15); background:color-mix(in srgb, var(--accent) 15%, transparent); color:var(--accent);}
+  .tag.p{background:rgba(175,82,222,.15); color:var(--purple);}
+  .tag.pass{background:rgba(255,149,0,.18); color:var(--gold);}
+
+  /* ==== 测验 ==== */
+  .q{background:var(--panel); border:1px solid var(--line); border-radius:14px; padding:14px; margin-bottom:12px;}
+  .q .qt{font-size:14px; font-weight:700; margin-bottom:10px;}
+  .opt{display:flex; align-items:flex-start; gap:9px; padding:10px 11px; border:1px solid var(--line); border-radius:10px;
+      margin-bottom:7px; font-size:13px; cursor:pointer; background:var(--panel2);}
+  .opt .dot{width:18px; height:18px; flex:0 0 18px; border-radius:50%; border:2px solid var(--sub);}
+  .opt.sel{border-color:var(--accent); background:rgba(0,122,255,.12); background:color-mix(in srgb, var(--accent) 12%, transparent);}
+  .opt.sel .dot{background:var(--accent); border-color:var(--accent);}
+  .opt.right{border-color:var(--accent2); background:rgba(52,199,89,.16);}
+  .opt.right .dot{background:var(--accent2); border-color:var(--accent2);}
+  .opt.wrong{border-color:var(--danger); background:rgba(255,59,48,.13);}
+  .opt.wrong .dot{background:var(--danger); border-color:var(--danger);}
+  .calc-row{display:flex; align-items:center; gap:8px; background:var(--panel2); border:1px solid var(--line); border-radius:10px; padding:9px 12px; margin-bottom:7px;}
+  .calc-row input{flex:1; min-width:0; background:var(--panel); border:1px solid var(--line); border-radius:10px; color:var(--txt); font-size:15px; padding:8px 10px; font-family:inherit;}
+  .calc-row input:focus{outline:none; border-color:var(--accent);}
+  .calc-row .unit{color:var(--sub); font-size:13px;}
+  .calc-row.right{border-color:var(--accent2); background:rgba(52,199,89,.16);}
+  .calc-row.wrong{border-color:var(--danger); background:rgba(255,59,48,.13);}
+  .calc-row .calc-ans{color:var(--accent2); font-size:12.5px; font-weight:700;}
+  .kind{font-size:10px; padding:1px 6px; border-radius:5px; margin-right:6px; font-weight:700; vertical-align:1px; background:rgba(0,122,255,.15); background:color-mix(in srgb, var(--accent) 15%, transparent); color:var(--accent);}
+  .explain{margin-top:8px; font-size:12.5px; color:var(--txt); background:rgba(255,149,0,.14); border:none;
+      border-radius:10px; padding:9px 11px; display:none;}
+  .result{font-size:18px; font-weight:800; text-align:center; padding:16px;}
+  .result.good{color:var(--accent2);} .result.bad{color:var(--gold);}
+
+  /* ==== 记录 ==== */
+  .cal{display:grid; grid-template-columns:repeat(7,1fr); gap:5px; margin-top:10px;}
+  .cal .d{aspect-ratio:1; border-radius:7px; background:var(--panel3); border:none;
+      display:flex; align-items:center; justify-content:center; font-size:10px; color:var(--sub);}
+  .cal .d.on{background:var(--accent2); color:#06110a; border-color:var(--accent2); font-weight:800;}
+  .cal .d.today{outline:2px solid var(--accent); outline-offset:1px;}
+  .ach{display:flex; gap:10px; align-items:center; padding:10px 4px; border-bottom:.5px solid var(--sep);}
+  .ach:last-child{border-bottom:none;}
+  .ach .ai{font-size:24px; filter:grayscale(1) opacity(.35);}
+  .ach.got .ai{filter:none;}
+  .ach .an{font-size:13.5px; font-weight:700;}
+  .ach .ad{font-size:11.5px; color:var(--sub);}
+  .xprow{display:flex; align-items:center; gap:10px; padding:8px 4px; font-size:12.5px;}
+  .xprow .name{flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+
+  /* ==== 错题本 ==== */
+  .wrongitem{background:var(--panel); border:1px solid var(--line); border-left:3px solid var(--danger);
+      border-radius:12px; padding:12px; margin-bottom:10px;}
+  .wrongitem .q{background:none; border:none; padding:0; margin:0;}
+  .wrongitem .ans{font-size:13px; margin-top:6px;}
+  .wrongitem .ans .ok{color:var(--accent2); font-weight:700;}
+  .wrongitem .ans .no{color:var(--danger); text-decoration:line-through;}
+
+  /* ==== 弹层 ==== */
+  .toast{position:fixed; left:50%; bottom:84px; transform:translateX(-50%) translateY(20px);
+      background:rgba(28,28,30,.94); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px); border:none; color:#fff; padding:11px 18px; border-radius:14px;
+      font-size:13px; font-weight:600; opacity:0; pointer-events:none; transition:.3s; z-index:99; max-width:90vw; text-align:center; box-shadow:0 8px 30px rgba(0,0,0,.25);}
+  .toast.show{opacity:1; transform:translateX(-50%) translateY(0);}
+  .levelup{position:fixed; inset:0; z-index:100; display:none; align-items:center; justify-content:center;
+      background:rgba(5,8,12,.82); backdrop-filter:blur(4px);}
+  .levelup.show{display:flex; animation:fade .3s;}
+  @keyframes fade{from{opacity:0;}to{opacity:1;}}
+  .levelup .box{text-align:center; padding:30px; animation:pop .5s cubic-bezier(.2,1.4,.4,1);}
+  @keyframes pop{from{transform:scale(.6); opacity:0;}to{transform:scale(1); opacity:1;}}
+  .levelup .big{font-size:64px; animation:spin 1s;}
+  @keyframes spin{from{transform:rotate(-20deg) scale(.5);}to{transform:rotate(0) scale(1);}}
+  .levelup .up1{font-size:14px; color:var(--gold); font-weight:800; letter-spacing:4px; margin-top:6px;}
+  .levelup .up2{font-size:26px; font-weight:900; margin-top:6px; background:linear-gradient(90deg,#ffd25c,#ff9a3c);
+      -webkit-background-clip:text; background-clip:text; color:transparent;}
+  .levelup .up3{font-size:12.5px; color:var(--sub); margin-top:8px;}
+  .levelup .btn{margin-top:20px;}
+  .center-empty{text-align:center; color:var(--sub); padding:50px 20px; font-size:13.5px;}
+  .center-empty .ic{font-size:40px; display:block; margin-bottom:10px; filter:grayscale(.4);}
+</style>
+</head>
+<body>
+<div id="view"></div>
+<nav class="tabbar">
+  <button data-tab="home"><span class="ic">🏠</span>主页</button>
+  <button data-tab="map"><span class="ic">🗺️</span>地图</button>
+  <button data-tab="kb"><span class="ic">📚</span>知识库</button>
+  <button data-tab="wrong"><span class="ic">📕</span>错题本</button>
+  <button data-tab="records"><span class="ic">📊</span>记录</button>
+</nav>
+<div class="toast" id="toast"></div>
+<div class="levelup" id="levelup"></div>
+
+<script>
+/* ==================== 数据 ==================== */
+const RANKS = [
+  { min:0,    name:'见习电工',       icon:'🌱' },
+  { min:200,  name:'熟练电工',       icon:'🔧' },
+  { min:600,  name:'电气技术员',     icon:'⚡' },
+  { min:1200, name:'电气工程师',     icon:'🎯' },
+  { min:2000, name:'资深电气工程师', icon:'🏆' },
+];
+const TIERS = {
+  green:  ['🟢 第一阶段 · 地基',         '#22c55e'],
+  yellow: ['🟡 第二阶段 · 元件与硬逻辑', '#eab308'],
+  red:    ['🔴 第三阶段 · 分水岭',       '#ef4444'],
+  blue:   ['🔵 第四阶段 · PLC',          '#3ea6ff'],
+  purple: ['🟣 第五阶段 · 高手进阶',     '#a855f7'],
+};
+
+const LEVELS = [
+  { id:1, tier:'green', title:'电学基础', sub:'欧姆定律 · 功率 · 三相电', 
+    teach:`
+<h4>① 欧姆定律</h4>
+<p>电流、电压、电阻三者相互制约,是整个电学的根。</p>
+<formula>U = I × R</formula>
+<ul>
+<li><b>电压 U</b>(伏 V):推动电流的"压力"。</li>
+<li><b>电流 I</b>(安 A):单位时间流过的电荷量。</li>
+<li><b>电阻 R</b>(欧 Ω):对电流的阻碍。</li>
+</ul>
+<tip>记法:遮住要求的那个量,剩下两个的关系就是公式。求 I 遮 I → U/R;求 U 遮 U → I×R。</tip>
+
+<h4>② 电功率与电能</h4>
+<formula>P = U × I  (单相)</formula>
+<formula>P = √3 × U线 × I × cosφ  (三相)</formula>
+<ul>
+<li>电能 W = P × t,1kWh = 一度电。</li>
+<li>发热功率 P = I²R,与电流平方成正比 —— 这是过载发热的根源。</li>
+</ul>
+
+<h4>③ 串联与并联</h4>
+<p><b>串联</b>:电流处处相同,电压按电阻分配,总电阻相加。</p>
+<p><b>并联</b>:电压相同,电流按支路分配。</p>
+<warn>别搞混:串联"分压不分流",并联"分流不分压"。两个相等电阻并联,总阻减半。</warn>
+
+<h4>④ 三相电</h4>
+<p>三相相位互差 120°,能产生旋转磁场。</p>
+<formula>线电压 = √3 × 相电压  (380V / 220V)</formula>
+<ul>
+<li><b>星形(Y)</b>:线电压 380V,相电压 220V。</li>
+<li><b>三角形(△)</b>:线电压 = 相电压。</li>
+<li>三相电机比单相"劲儿大",就是因为旋转磁场让转矩更平稳。</li>
+</ul>
+
+<h4>⑤ 功率因数</h4>
+<p><b>cosφ</b> = 有功 / 视在。越低,无功越多,供电效率越差。</p>
+<tip>电机、变压器等感性负载会拉低 cosφ,常用<b>并联电容</b>就地补偿,提高 cosφ、降低线损。</tip>
+`,
+    tasks:[
+      {type:'学', text:'欧姆定律 / 功率 / 串并联 / 交流直流 / 三相电 / 功率因数', xp:20},
+      {type:'练', text:'手算 3 道题:已知电压电流求功率等', xp:30},
+      {type:'过', text:'通关:不看公式讲清"为什么三相电机比单相劲儿大"', xp:50},
+    ],
+    quiz:[
+      {q:'一个 220V、10A 的负载,功率是多少?', options:['1100W','2200W','22W','220W'], answer:1, explain:'P = U×I = 220×10 = 2200W(= 2.2kW)。'},
+      {q:'串联电路中,各元件哪个量相同?', options:['电压','电流','电阻','功率'], answer:1, explain:'串联电流处处相同;电压按电阻分配。'},
+      {q:'三相四线制中,线电压与相电压的关系是?', options:['相等','线=√3×相','线=相/√3','线=2×相'], answer:1, explain:'线电压 = √3 × 相电压,220V×1.732≈380V。'},
+      {q:'功率因数越低,说明什么?', options:['有功占比越大','无功占比越大','电流越小','更省电'], answer:1, explain:'cosφ 低 = 无功功率占比大,供电效率差,常需电容补偿。'},
+      {q:'功率的计算公式是?', options:['P=U/I','P=U×I','P=I/U','P=U+I'], answer:1, explain:'功率 P=U×I,对直流或纯电阻交流成立。'},
+      {q:'并联电路中,各支路哪个量相同?', options:['电流','电压','电阻','功率'], answer:1, explain:'并联各支路电压相同;电流按支路电阻分配。'},
+      {q:'三相电机比同功率单相电机转矩更平稳,主要是因为它?', options:['电流小','产生旋转磁场','电压高','没有原因'], answer:1, explain:'三相绕组产生旋转磁场,启动和运行转矩更平稳、效率更高。'},
+      {q:'1kWh(一度电)表示什么?', options:['功率1kW','1kW 用 1 小时的电能','电压1kV','电流1kA'], answer:1, explain:'1kWh=1kW×1h,是能量单位,即“用了一度电”。'},
+      {q:'提高功率因数常用的办法是?', options:['串联电阻','并联电容补偿','降低电压','增大电流'], answer:1, explain:'感性负载并联电容器就地补偿无功,提高 cosφ、降低线损。'},
+      {q:'导体电阻的大小与什么有关?', options:['只与长度','材料、长度、截面积和温度','只与颜色','只与电压'], answer:1, explain:'R=ρL/S,与材料电阻率、长度成正比、截面积成反比,并随温度变化。'},
+      {type:'calc', q:'一个 220V、5A 的电阻性负载,功率是多少?(单位 W)', answer:1100, unit:'W', tol:5, explain:'P=U×I=220×5=1100W。'},
+      {type:'calc', q:'电阻 20Ω,两端电压 12V,通过它的电流是多少?(单位 A)', answer:0.6, unit:'A', tol:0.02, explain:'I=U/R=12/20=0.6A。'},
+      {kind:'logic', q:'三个 30Ω 电阻串联总电阻是 A;改成并联总电阻是 B。哪组正确?', options:['A=90Ω, B=10Ω','A=10Ω, B=90Ω','A=90Ω, B=30Ω','A=30Ω, B=90Ω'], answer:0, explain:'串联相加=90Ω;并联=30/3=10Ω。'},
+      {kind:'logic', q:'同一个电阻,两端电压升高到原来的 2 倍,电流会?', options:['不变','变为 2 倍','变为一半','变为 1/4'], answer:1, explain:'I=U/R,电阻不变时电压翻倍,电流也翻倍。'},
+    ]},
+  { id:2, tier:'green', title:'识图读图', sub:'符号 · 主回路 vs 控制回路', 
+    teach:`
+<h4>① 两类回路(最关键)</h4>
+<diagram id="mainctrl"/>
+<ul>
+<li><b>主回路</b>:走大电流 —— 电源 → 断路器 → 接触器主触点 → 热继 → 电机。</li>
+<li><b>控制回路</b>:走小电流 —— 按钮、线圈、辅助触点,决定主回路通断。</li>
+</ul>
+<key>读图顺序:先主回路(有电机、大元件),再看控制回路(细线、小触点)。</key>
+
+<h4>② 三种图</h4>
+<ul>
+<li><b>系统图</b>:整体供电结构(宏观)。</li>
+<li><b>原理图</b>:控制逻辑 —— 谁控制谁。</li>
+<li><b>接线图 / 端子图</b>:现场实际接线位置(线号、端子号)。</li>
+</ul>
+<warn>原理图讲"逻辑",接线图讲"实际接线位置",两者不能混看。</warn>
+
+<h4>③ 常用符号</h4>
+<ul>
+<li>QF 断路器,KM 接触器,FR 热继,KA 中间继电器,SB 按钮,KT 时间继电器,HL 指示灯,QS 隔离开关,FU 熔断器,TA 电流互感器,M 电机。</li>
+<li>接触器/继电器的<b>线圈</b>画方框,<b>主触点</b>管大电流,<b>辅助触点</b>管控制回路。</li>
+</ul>
+
+<h4>④ 读图四步法</h4>
+<ol>
+<li>先看主回路:找到电机、断路器、接触器、热继。</li>
+<li>再看控制回路:谁给线圈供电,串了哪些保护触点。</li>
+<li>找自锁、互锁、停止、急停。</li>
+<li>对照 I/O 表或元件表确认。</li>
+</ol>
+`,
+    tasks:[
+      {type:'学', text:'电气符号、主回路/控制回路、原理图/接线图/系统图区别', xp:20},
+      {type:'练', text:'拿你手里一份图,逐个元件标名称和作用', xp:30},
+      {type:'过', text:'通关:任何一段原理图能说出它想实现什么动作', xp:50},
+    ],
+    quiz:[
+      {q:'控制回路的主要作用是?', options:['送大电流给电机','控制主回路通断','保护接地','测量电压'], answer:1, explain:'控制回路通过接触器线圈等小电流元件,决定主回路通断。'},
+      {q:'原理图中"KM"通常代表?', options:['热继电器','断路器','接触器','电机'], answer:2, explain:'KM=接触器;FR=热继;QF=断路器;M=电机。'},
+      {q:'热继电器(FR)在原理图中的主要作用是?', options:['短路保护','过载保护','调压','隔离'], answer:1, explain:'热继用于电机过载保护;短路靠断路器/熔断器。'},
+      {q:'原理图和接线图的核心区别是?', options:['原理图更贵','原理图看逻辑,接线图看实际接线位置','接线图不看符号','没有区别'], answer:1, explain:'原理图表达控制逻辑;接线图指导现场实际接线。'},
+      {q:'主回路中通常不包含下面哪个?', options:['断路器','接触器主触点','接触器线圈','热继电器主触点'], answer:2, explain:'接触器线圈属控制回路;主触点、断路器、热元件在主回路。'},
+      {q:'原理图中 QF 代表?', options:['接触器','断路器','热继电器','按钮'], answer:1, explain:'QF=断路器;KM=接触器;FR=热继;SB=按钮。'},
+      {q:'原理图中 SB 通常代表?', options:['熔断器','按钮','电机','端子'], answer:1, explain:'SB=按钮(Switch Button)。'},
+      {q:'系统图主要用来做什么?', options:['指导现场接线','看整体供电结构与关系','测电流','写程序'], answer:1, explain:'系统图看宏观结构和供电关系,不指导具体接线。'},
+      {q:'“常开触点”的含义是?', options:['平时闭合,动作断开','平时断开,动作闭合','永远闭合','没有触点'], answer:1, explain:'常开(NO)平时断开,受力或通电后闭合;常闭(NC)相反。'},
+      {q:'接线图中线号/端号的作用是?', options:['装饰','标明每根线接到哪个端子','表示电压','表示功率'], answer:1, explain:'线号与端号让原理图能对应到现场实际接线位置。'},
+      {type:'calc', q:'控制电源 24V,接触器线圈电阻 240Ω,线圈电流是多少 mA?', answer:100, unit:'mA', tol:3, explain:'I=U/R=24/240=0.1A=100mA。'},
+      {type:'calc', q:'一个 24V 指示灯,内阻 480Ω,工作电流是多少 mA?', answer:50, unit:'mA', tol:2, explain:'I=U/R=24/480=0.05A=50mA。'},
+      {kind:'logic', q:'按启动按钮后电机不动,但接触器 KM1 已吸合、主触点也闭合,最可能的问题是?', options:['按钮坏了','主回路(断路器/热继)断开或电机故障','指示灯坏了','按钮颜色不对'], answer:1, explain:'KM1 吸合说明控制回路正常,问题应在主回路或负载侧。'},
+      {kind:'logic', q:'热继电器 FR 的常闭触点串在接触器线圈回路中,电机过载时会发生?', options:['FR 动作→常闭断开→接触器断电→电机停','FR 动作→电机加速','无变化','按钮自动按下'], answer:0, explain:'过载时 FR 双金属片动作,断开控制回路里的常闭触点,接触器释放、电机停止。'},
+    ]},
+  { id:3, tier:'yellow', title:'元器件认知', sub:'断路器 · 接触器 · 热继 · 传感器', 
+    teach:`
+<h4>① 断路器 QF</h4>
+<p>手动分合 + 过载 / 短路保护,用于主回路总开关或支路。</p>
+<ul><li>分 C 型(照明)、D 型(电机,抗启动冲击)。</li></ul>
+<warn>断路器不是越大越好!选大了,过载/短路时不能及时跳闸,就失去了保护作用。</warn>
+
+<h4>② 接触器 KM</h4>
+<p>用线圈小电流控制主触点大电流,可频繁通断。</p>
+<ul><li>主触点接主回路;辅助触点(常开/常闭)接控制回路。</li><li>选型看负载电流/功率、使用类别、通断频次。</li></ul>
+<tip>接触器"能频繁通断"靠的是电磁吸合 —— 线圈通电吸合、断电释放。</tip>
+
+<h4>③ 热继电器 FR</h4>
+<p>电机过载保护:双金属片受热变形,超过整定值推动常闭触点断开控制回路。</p>
+<key>整定电流 ≈ 电机额定电流;过载动作后可手动复位。</key>
+<warn>热继不做短路保护 —— 短路太快,热元件来不及动作,靠断路器/熔断器。</warn>
+
+<h4>④ 中间继电器 KA</h4>
+<p>用于信号传递、触点扩展、逻辑隔离;触点容量小,不能直接驱动大负载。</p>
+
+<h4>⑤ 按钮与指示灯</h4>
+<ul><li>启动按钮用<b>常开</b>(按下接通)。</li><li>停止按钮用<b>常闭</b>(串在回路,按下断开)。</li></ul>
+<tip>停止按钮为什么用常闭?断线时也能停,更安全 —— 这叫"失效安全"。</tip>
+
+<h4>⑥ 接近开关 / 熔断器</h4>
+<ul><li>接近开关:非接触检测位置,无磨损;输出分 NPN/PNP,接 PLC 注意极性。</li><li>熔断器 FU:短路保护,一次性,熔断后需更换。</li></ul>
+`,
+    tasks:[
+      {type:'学', text:'断路器/接触器/热继/中间继/按钮/指示灯/接近开关的作用与选型', xp:30},
+      {type:'练', text:'把一个真实柜子的元件列成表,写每个的作用', xp:45},
+      {type:'过', text:'通关:随便指一个元件,说出作用 + 什么时候会坏', xp:75},
+    ],
+    quiz:[
+      {q:'接触器主触点的用途是?', options:['通断主回路大电流','信号隔离','测量电流','限流'], answer:0, explain:'主触点串在主回路通断大电流;辅助触点用于控制回路。'},
+      {q:'热继电器主要保护什么?', options:['短路','电机过载','漏电','过压'], answer:1, explain:'热继靠双金属片受热动作,专门做过载保护。'},
+      {q:'中间继电器(KA)的主要作用是?', options:['直接驱动大电机','信号传递与触点扩展','整流','变频'], answer:1, explain:'KA 用于信号传递、扩展触点数量、逻辑隔离,不能带大负载。'},
+      {q:'断路器相比接触器,哪个说法正确?', options:['断路器靠线圈控制','断路器可手动分合且带保护','接触器带短路保护','两者完全一样'], answer:1, explain:'断路器手动操作且自带过载/短路保护;接触器靠线圈控制、负责频繁通断。'},
+      {q:'热继电器过载动作后,通常如何恢复?', options:['永久损坏','冷却后手动或自动复位','换电机','无法恢复'], answer:1, explain:'双金属片冷却后可复位,多数设手动复位更安全。'},
+      {q:'启动按钮用常开、停止按钮用常闭,主要因为?', options:['颜色需要','停止用常闭更安全,断线也能停','常开不能停止','没有原因'], answer:1, explain:'停止用常闭串入回路,按动或断线都会断开,安全可靠性更高。'},
+      {q:'接近开关相比机械限位开关的优势是?', options:['更便宜','非接触、寿命长、响应快','更省电','能测电压'], answer:1, explain:'非接触检测,无机械磨损、响应快,适合高频动作场合。'},
+      {q:'接触器能频繁通断,靠的是什么?', options:['手动操作','线圈电磁吸合','加热','摩擦'], answer:1, explain:'电磁线圈通电吸合、断电释放,可实现频繁可靠的自动通断。'},
+      {q:'热继电器的整定电流应取多大?', options:['随意','接近电机额定电流','远大于额定电流','取零'], answer:1, explain:'整定到接近电机额定电流,才能既躲过正常电流又及时过载保护。'},
+      {q:'中间继电器能否直接驱动大功率电机?', options:['能,越大越好','不能,触点容量小,需经接触器','能,只要电压够','看颜色'], answer:1, explain:'中间继电器触点容量小,用于信号和逻辑,驱动大负载要靠接触器。'},
+      {type:'calc', q:'电机额定电流 8A,热继电器按 1.1 倍整定,应整定多少 A?(保留一位小数)', answer:8.8, unit:'A', tol:0.1, explain:'8×1.1=8.8A。'},
+      {type:'calc', q:'一个 24V 中间继电器线圈功率 2.4W,工作电流是多少 mA?', answer:100, unit:'mA', tol:3, explain:'I=P/U=2.4/24=0.1A=100mA。'},
+      {kind:'logic', q:'设备运行时接触器发出很大“嗡嗡”声且吸不到底,最可能的原因是?', options:['电压过低或线圈/铁芯故障','线太细','按钮太旧','指示灯烧了'], answer:0, explain:'异常嗡鸣多为线圈欠压或铁芯卡滞、短路环问题。'},
+      {kind:'logic', q:'同一个按钮要实现“启动”,应接它的哪种触点?', options:['常开触点','常闭触点','无所谓','接外壳'], answer:0, explain:'启动用常开:按下接通,再由自锁保持;停止才用常闭。'},
+    ]},
+  { id:4, tier:'yellow', title:'继电器-接触器逻辑', sub:'启保停 · 互锁 · 正反转 · 星三角', 
+    teach:`
+<h4>① 启保停(自锁)⭐</h4>
+<p>电工转工程师的第一道门 —— 它和 PLC 逻辑完全相通。</p>
+<diagram id="hold"/>
+<ul>
+<li>按下启动 SB2 → 接触器 KM 得电 → KM 常开辅助触点闭合"锁住"自己 → 松手仍通电。</li>
+<li>停止 SB1 用常闭串联,按下即断开回路。</li>
+</ul>
+<key>结构 = 启动(常开)∥ 自锁(常开),再串停止(常闭)。</key>
+
+<h4>② 互锁</h4>
+<p>两个接触器不能同时吸合(会短路),各串入对方的常闭触点。</p>
+
+<h4>③ 正反转</h4>
+<diagram id="fwdrev"/>
+<ul><li>交换任意两相实现反转。</li><li>必须电气互锁 + 机械互锁,防止同时吸合造成相间短路。</li></ul>
+
+<h4>④ 星三角降压启动</h4>
+<p>启动时绕组接星形,相电压降到 1/√3,启动电流降到约 1/3;延时后切换成三角全压运行。</p>
+<tip>适合轻载 / 空载启动的大功率电机,减小对电网的冲击。</tip>
+
+<h4>⑤ 顺序控制</h4>
+<p>用前一步的完成信号(限位 / 定时 / 传感器)启动下一步,可逆序停机形成连锁。</p>
+<warn>顺序控制最怕"跳步、乱步" —— 每步必须有明确的转入 / 转出条件。</warn>
+`,
+    tasks:[
+      {type:'学', text:'启保停、互锁、正反转、星三角、顺序控制', xp:40},
+      {type:'练', text:'画出星三角降压启动的完整控制回路', xp:60},
+      {type:'过', text:'通关:独立设计一个小控制回路,不照抄', xp:100},
+    ],
+    quiz:[
+      {q:'"自锁"是指?', options:['按钮卡住','用自身常开触点保持线圈得电','保险丝','接地'], answer:1, explain:'自锁=把接触器自己的常开辅助触点并联在启动按钮上,松手后继续得电。'},
+      {q:'电机正反转控制必须加什么?', options:['延时器','互锁','熔断器','电容'], answer:1, explain:'两个接触器必须互锁(电气互锁+机械互锁),防止同时吸合造成相间短路。'},
+      {q:'星三角启动的主要目的是?', options:['提高转速','降低启动电流','提高功率因数','省电运行'], answer:1, explain:'星形接法降低绕组电压,启动电流降到约 1/3,减小对电网冲击。'},
+      {q:'停止按钮在回路中通常用什么触点?', options:['常开','常闭','两者都行','独立电源'], answer:1, explain:'停止按钮用常闭串联,按下断开回路,断电即停更安全。'},
+      {q:'正反转除电气互锁,还常加什么互锁?', options:['机械互锁','水冷','熔断器','电容'], answer:0, explain:'除电气互锁(串对方常闭)外再加机械互锁更可靠,防止同时吸合。'},
+      {q:'星三角切换延时常由什么完成?', options:['时间继电器','电流表','按钮','指示灯'], answer:0, explain:'用时间继电器延时,待启动电流降下来再切三角全压运行。'},
+      {q:'两个接触器互锁,具体做法是?', options:['并在一起','各串入对方的常闭触点','共用一个线圈','接地'], answer:1, explain:'A 的线圈回路串 B 的常闭,B 的回路串 A 的常闭,一个吸合断开另一个。'},
+      {q:'启保停电路里,停止按钮与启动按钮如何连接?', options:['串联','并联','都常开','都常闭'], answer:0, explain:'停止(常闭)与启动(常开)串联,再与自锁触点并联。'},
+      {q:'点动控制的特点是?', options:['松开按钮即停','松手继续运行','需要互锁','需要延时'], answer:0, explain:'点动没有自锁,按住才动、松开即停;启保停则松手仍运行。'},
+      {q:'顺序控制中,下一步的启动条件通常是?', options:['随机触发','前一步的完成信号','时间到就无条件进','每次手动按'], answer:1, explain:'用前一步完成的信号(如限位、定时)去启动下一步,逐步推进。'},
+      {type:'calc', q:'某电机启动电流是额定 6 倍(额定 10A),星形启动电流约为直接启动的 1/3,星形启动电流约多少 A?', answer:20, unit:'A', tol:1, explain:'直接启动 6×10=60A,星形约 1/3 → 20A。'},
+      {kind:'logic', q:'按启动按钮 KM 吸合,一松手 KM 立即释放。最可能缺少什么?', options:['自锁(未把 KM 常开触点并联在启动按钮上)','热继电器','指示灯','电压'], answer:0, explain:'没有自锁,松手回路断开、KM 释放——这是点动而非启保停。'},
+      {kind:'logic', q:'正转后立即按反转,反转接触器却不动作,原因是?', options:['电气互锁常闭触点断开','按钮坏了','电机过热','没通电'], answer:0, explain:'正转接触器吸合时其常闭断开,切断反转回路,防止同时吸合短路。'},
+      {kind:'logic', q:'要求“先启动 M1 再启动 M2,停机先停 M2 再停 M1”,这属于?', options:['顺序控制(连锁)','点动','正反转','降压启动'], answer:0, explain:'按先后顺序启停并互相联锁,是典型的顺序控制。'},
+    ]},
+  { id:5, tier:'red', title:'计算与选型 · 分水岭', sub:'负荷 · 线径 · 压降 · 短路电流', 
+    teach:`
+<h4>① 电机额定电流</h4>
+<formula>I = P / (√3 × U × cosφ × η)</formula>
+<ul><li>经验:380V 电机"1kW ≈ 2A"。</li><li>例:7.5kW、cosφ 0.85、η 0.9 → I ≈ 15A。</li></ul>
+
+<h4>② 导线截面积与载流量</h4>
+<ul>
+<li>按<b>载流量</b>选截面积,再校核压降与短路热稳定。</li>
+<li>参考:1.5mm²≈10A,2.5mm²≈16-20A,4mm²≈25A,6mm²≈32A(以手册为准)。</li>
+</ul>
+
+<h4>③ 线路压降</h4>
+<formula>ΔU ≈ I × R线路  (单相往返要 ×2)</formula>
+<key>一般要求末端压降 ≤ 5%。线越长、电流越大、线越细,压降越大。</key>
+
+<h4>④ 断路器与接触器选型</h4>
+<ul>
+<li>断路器:额定电流略大于负载电流(电机取 1.2~1.5 倍并配合启动方式),同时满足短路分断能力。</li>
+<li>接触器:按负载功率 / 电流、使用类别(AC-3 电机)、通断频率选。</li>
+</ul>
+<warn>过大会失去保护,过小会频繁误跳 —— 要匹配,不是越大越好。</warn>
+
+<h4>⑤ 短路电流</h4>
+<p>用于校核保护电器的分断能力和电缆热稳定,并做上、下级选择性配合。</p>
+<tip>"凭经验选"和"算完能讲出依据" —— 这就是电工和工程师的分水岭。</tip>
+`,
+    tasks:[
+      {type:'学', text:'负荷计算、线径/压降、断路器/接触器/热继选型、短路电流估算', xp:60},
+      {type:'练', text:'给 7.5kW 电机算线径 + 选接触器 + 选断路器,写出依据', xp:90},
+      {type:'过', text:'通关:能用计算讲出"为什么这么选",而非"师傅说这么接"', xp:150},
+    ],
+    quiz:[
+      {q:'7.5kW 三相电机(380V、cosφ≈0.85、η≈0.9)额定电流约多少?', options:['约 7.5A','约 15A','约 30A','约 50A'], answer:1, explain:'I=7500/(1.732×380×0.85×0.9)≈15A。经验公式"1kW≈2A"也吻合。'},
+      {q:'断路器额定电流应该怎么选?', options:['越大越安全','略大于负载电流并配合启动','等于负载电流的一半','随便选'], answer:1, explain:'要略大于负载电流才能躲过启动冲击,又不是越大越好,过大就失去保护作用。'},
+      {q:'增大导线截面积的主要好处是?', options:['省铜','载流量增大、压降减小','提高电压','降低频率'], answer:1, explain:'截面积越大电阻越小,载流量上升、线路压降下降。'},
+      {q:'长距离供电时,尤其要校核什么?', options:['颜色','线路压降','螺丝','标签'], answer:1, explain:'线长电阻大,末端电压可能不达标,必须校核压降(一般要求 ≤5%)。'},
+      {q:'三相电机功率公式中的 η 表示什么?', options:['频率','效率','相位','电阻'], answer:1, explain:'η 是效率;输出功率除以效率才是输入电功率,故 I=P/(√3×U×cosφ×η)。'},
+      {q:'15A 的负载,铜导线常选多大截面积?', options:['0.5mm²','1.0mm²','2.5mm²','10mm²'], answer:2, explain:'按载流量,15A 常配 2.5mm² 铜线,还须校核压降和敷设方式。'},
+      {q:'线路压降一般要求控制在多少以内?', options:['约 5%','50%','100%','无要求'], answer:0, explain:'一般要求末端压降不超过额定电压的约 5%,保证设备正常工作。'},
+      {q:'接触器选型主要依据什么?', options:['颜色','负载功率/电流等级和通断频次','品牌','产地'], answer:1, explain:'按负载电流、功率等级、使用类别和通断频率选,并留合理余量。'},
+      {q:'短路电流估算主要用于什么?', options:['算颜色','校核保护电器的分断能力和电缆热稳定','测温度','算电费'], answer:1, explain:'用来选断路器/熔断器的分断能力,校核电缆能承受短路热效应。'},
+      {q:'导线的载流量是指?', options:['导线能长期安全通过的电流','导线的重量','导线的价格','导线颜色'], answer:0, explain:'载流量是导线在允许温升下能长期通过的最大电流,与截面、敷设、温度有关。'},
+      {type:'calc', q:'三相电机 380V、11kW、cosφ=0.85、效率 0.9,额定电流约多少 A?(保留一位小数)', answer:21.9, unit:'A', tol:1.0, explain:'I=11000/(√3×380×0.85×0.9)=11000/503.5≈21.9A。'},
+      {type:'calc', q:'一台 15kW、380V 电机,按经验“1kW≈2A”估算额定电流约多少 A?', answer:30, unit:'A', tol:2, explain:'15×2=30A(经验估算,精确值按公式算)。'},
+      {type:'calc', q:'线路负载电流 20A,线路电阻合计 0.2Ω,线路电压损失约多少 V?', answer:4, unit:'V', tol:0.2, explain:'ΔU=I×R=20×0.2=4V。'},
+      {type:'calc', q:'电机额定电流 18A,断路器按 1.2 倍选择,应选多少 A?(取整数)', answer:22, unit:'A', tol:1, explain:'18×1.2=21.6≈22A,实际再按曲线/规格校核。'},
+      {kind:'logic', q:'有人说“断路器选得越大越安全”,对吗?', options:['对,越大越好','不对,过大会在过载/短路时不能及时跳闸,失去保护','对,越贵越好','不对,越小越好'], answer:1, explain:'断路器须与负载匹配:过大则保护失效,过小则频繁误跳。'},
+    ]},
+  { id:6, tier:'blue', title:'PLC 入门', sub:'硬件结构 · 扫描机制 · 梯形图', 
+    teach:`
+<h4>① PLC 是什么</h4>
+<p>可编程逻辑控制器:用程序实现控制逻辑,替代继电器盘。</p>
+<ul><li>构成:电源、CPU、输入模块、输出模块、通讯口。</li><li>输入(X/%I)、输出(Y/%Q)、中间(M)、定时(T)、计数(C)。</li></ul>
+
+<h4>② 扫描机制(核心)</h4>
+<diagram id="scan"/>
+<key>循环执行:输入采样 → 程序执行 → 输出刷新,周期只有几毫秒。</key>
+<p>程序读的是输入映像区快照,保证同一周期内逻辑一致。</p>
+
+<h4>③ 梯形图与继电逻辑对应</h4>
+<ul>
+<li>按钮 / 开关 → 输入触点(X)。</li>
+<li>接触器线圈 / 灯 → 输出线圈(Y)。</li>
+<li>自锁 → 输出线圈的常开触点并联启动触点。</li>
+</ul>
+<diagram id="hold"/>
+
+<h4>④ 为什么用 PLC</h4>
+<tip>改逻辑只需改程序,不用改接线;还能通讯组网、处理复杂逻辑,可靠性也更高。</tip>
+`,
+    tasks:[
+      {type:'学', text:'PLC 硬件结构、输入/输出、扫描机制、梯形图基础、软件基本操作', xp:50},
+      {type:'练', text:'把 Lv4 的启保停翻译成梯形图,两者对照', xp:75},
+      {type:'过', text:'通关:写出第一个能跑启保停的 PLC 程序', xp:125},
+    ],
+    quiz:[
+      {q:'PLC 扫描周期的正确顺序是?', options:['输出→程序→输入','输入采样→程序执行→输出刷新','程序→输入→输出','随机执行'], answer:1, explain:'每个周期先读输入、再算程序、最后刷新输出,循环往复。'},
+      {q:'梯形图里"自锁"怎么实现?', options:['加延时','输出线圈的常开触点并联启动触点','串联电阻','接地'], answer:1, explain:'和继电器一样,用输出自身的常开触点并联在启动条件上锁住自己。'},
+      {q:'PLC 中的 X 和 Y 通常代表?', options:['输入/输出','电源/地','模拟量/数字量','正/负'], answer:0, explain:'X(或 %I)是输入,Y(或 %Q)是输出,因品牌略有不同。'},
+      {q:'PLC 相比纯继电器控制的优势是?', options:['更贵就是好','逻辑可灵活修改、可通讯','不需要电','不会坏'], answer:1, explain:'改逻辑只需改程序,还能通讯组网、处理复杂逻辑,可靠性也更高。'},
+      {q:'PLC 一个扫描周期通常多长?', options:['几秒','几毫秒级','几小时','随机'], answer:1, explain:'通常几毫秒到几十毫秒,远快于人操作和多数工艺需求。'},
+      {q:'输入采样阶段,PLC 做什么?', options:['把输入状态读入输入映像区','写输出','断电','通讯'], answer:0, explain:'先读所有输入到映像区,程序用的是这份快照,保证同周期一致。'},
+      {q:'梯形图中一个梯级(网络/行)通常表示?', options:['一条控制逻辑','一个文件','一个电机','一种颜色'], answer:0, explain:'一个梯级表达一条自左向右、自上而下的逻辑。'},
+      {q:'PLC 的数字量输出(Y)通常驱动什么?', options:['接触器线圈、指示灯','直接驱动大功率电机','高压母线','传感器'], answer:0, explain:'输出容量有限,通常驱继电器、接触器线圈、指示灯,大负载经中间环节。'},
+      {q:'PLC 相比继电器盘,改动逻辑时?', options:['要重新接线','只改程序即可','要换整套','无法修改'], answer:1, explain:'逻辑在程序里,改逻辑不用改接线,这是 PLC 最大优势之一。'},
+      {q:'梯形图中的常闭触点在输入为 0 时?', options:['导通','断开','烧毁','无变化'], answer:0, explain:'常闭(NC)在输入为 0/断开时导通,常用于停止、互锁等安全逻辑。'},
+      {type:'calc', q:'PLC 扫描周期 5ms,1 秒内大约扫描多少次?', answer:200, unit:'次', tol:5, explain:'1000ms ÷ 5ms = 200 次/秒。'},
+      {type:'calc', q:'一个定时器设定值 50,时基 100ms,定时时间为多少秒?', answer:5, unit:'s', tol:0.1, explain:'50×100ms=5000ms=5s。'},
+      {kind:'logic', q:'梯形图中,启动按钮 X0(常开)与输出 Y0 的常开触点并联后驱动 Y0。按下 X0 再松开,会怎样?', options:['Y0 保持接通(自锁)','Y0 立即断开','Y0 闪烁','报错'], answer:0, explain:'Y0 常开触点并联在启动触点上形成自锁,松开 X0 后经自锁继续接通。'},
+      {kind:'logic', q:'为什么 PLC 同一周期内,程序读到的输入状态保持不变?', options:['输入在采样阶段被读入映像区,程序用这份快照','因为 PLC 很快','因为输入是模拟量','没有原因'], answer:0, explain:'输入采样后存入输入映像区,程序执行读的是快照,保证同周期逻辑一致。'},
+    ]},
+  { id:7, tier:'blue', title:'PLC 进阶', sub:'定时器 · 状态机 · PID · 模拟量', 
+    teach:`
+<h4>① 定时器与计数器</h4>
+<ul><li>TON 通电延时、TOF 断电延时;CTU 加计数、CTD 减计数。</li><li>定时时间 = 设定值 × 时基。</li></ul>
+
+<h4>② 顺序 / 状态机控制</h4>
+<p>用"步(Step)"描述流程:当前步满足条件才进入下一步,工业控制最常用、最清晰。</p>
+<warn>每步要设超时监控 —— 迟迟不满足条件应报警停机,避免卡死或误动作。</warn>
+
+<h4>③ 模拟量</h4>
+<ul><li>信号:4-20mA、0-10V,对应温度 / 压力 / 频率等工程量。</li><li>4mA 常为量程下限(活零点),便于断线检测。</li></ul>
+<formula>工程量 = (原始值 − 下限) / (上限 − 下限) × 量程范围</formula>
+
+<h4>④ PID</h4>
+<diagram id="pid"/>
+<ul><li>P 比例:按偏差响应,快但可能超调。</li><li>I 积分:消除稳态误差。</li><li>D 微分:抑制超调、预判趋势。</li></ul>
+<tip>温控、压力、流量常用;整定从 P 起,不够再加 I。</tip>
+`,
+    tasks:[
+      {type:'学', text:'定时器/计数器、状态机/顺序控制、模拟量、PID、运动控制基础', xp:70},
+      {type:'练', text:'写一个"物料传送带顺序控制"', xp:105},
+      {type:'过', text:'通关:一个带状态流转的多工位程序,能跑通', xp:175},
+    ],
+    quiz:[
+      {q:'TON 定时器是哪种?', options:['通电延时','断电延时','加计数','累加'], answer:0, explain:'TON=Timer On Delay,通电延时;TOF=断电延时。'},
+      {q:'顺序控制最常用什么方法实现?', options:['随机逻辑','状态机/步序控制','只用一个定时器','全靠人工'], answer:1, explain:'用步(Step)驱动,当前步条件满足才进下一步,逻辑清晰可维护。'},
+      {q:'PID 中 P(比例)的作用是?', options:['消除稳态误差','按偏差大小快速响应','微分预测','滤波'], answer:1, explain:'P 按当前偏差成正比输出,响应快但过大易超调;I 消除稳态误差。'},
+      {q:'模拟量输入 4-20mA 中的 4mA 通常代表?', options:['电流下限','量程下限(活零点)','断电','最大值'], answer:1, explain:'4mA 对应量程下限,这样 0mA 可判定为断线,便于故障检测。'},
+      {q:'CTU 是什么?', options:['加计数器','减计数器','定时器','比较器'], answer:0, explain:'CTU=Count Up 加计数;CTD=减计数。'},
+      {q:'TOF 定时器是哪种?', options:['通电延时','断电延时','计数','比较'], answer:1, explain:'TOF=Timer Off Delay,输入变 0 后延时动作。'},
+      {q:'PID 中 I(积分)的主要作用是?', options:['快速响应','消除稳态误差','预测趋势','滤波'], answer:1, explain:'积分累积偏差,最终消除稳态误差,但过强会引起振荡。'},
+      {q:'远距离传输时,0-10V 与 4-20mA 哪个更抗干扰?', options:['0-10V','4-20mA 电流信号','一样','都不行'], answer:1, explain:'电流信号抗干扰强、可长距离,且 4mA 活零点便于断线检测。'},
+      {q:'“步序控制”最怕出现什么?', options:['步序太多','跳步/乱步——缺少条件约束','颜色单一','没有风险'], answer:1, explain:'每步必须严格由条件驱动进出,否则会跳步、乱步,导致动作混乱。'},
+      {q:'温度 PID 回路中加 D(微分)主要是为了?', options:['增大误差','抑制超调、预判趋势','断电','省电'], answer:1, explain:'微分对偏差变化率响应,能提前制动、抑制超调,改善稳定性。'},
+      {type:'calc', q:'4-20mA 变送器,量程 0-100℃。电流为 12mA 时,温度是多少 ℃?', answer:50, unit:'℃', tol:1, explain:'(12-4)/(20-4)=0.5,对应量程 50%,即 50℃。'},
+      {type:'calc', q:'编码器每转 1000 脉冲,转速 600 转/分,PLC 每秒应收到多少脉冲?(单位 Hz)', answer:10000, unit:'Hz', tol:100, explain:'600转/分=10转/秒,10×1000=10000 脉冲/秒。'},
+      {kind:'logic', q:'顺序控制到第 2 步,等“到位”信号 500ms 没来,最该做的是?', options:['直接跳到第 3 步','超时报警/停机并提示','忽略','重启 PLC'], answer:1, explain:'每步应有超时监控,迟迟不满足条件应报警停机,避免卡死或误动作。'},
+      {kind:'logic', q:'PID 调温时温度稳定地低于设定值一点点(不振荡),最该增大哪个作用?', options:['积分 I(消除稳态误差)','微分 D','都不需要','关掉 PID'], answer:0, explain:'稳定的残余偏差=稳态误差,增大积分能消除(纯 P 通常留有余差)。'},
+    ]},
+  { id:8, tier:'purple', title:'变频器与传动', sub:'参数 · 多段速 · 伺服/步进', 
+    teach:`
+<h4>① 变频器原理</h4>
+<p>改变供电频率调速,保持 V/F 恒定。</p>
+<diagram id="vf"/>
+<key>低频时电压也相应降低,避免磁饱和、维持转矩。</key>
+
+<h4>② 参数设置要点</h4>
+<ul><li>额定电压 / 电流 / 频率、上限频率、加速 / 减速时间、转矩提升、保护。</li></ul>
+<warn>加速时间太短易跳过流;普通电机低速自冷差,长时间低速运行要散热。</warn>
+
+<h4>③ 多段速与模拟量调速</h4>
+<ul>
+<li>多段速:几个数字端子组合选固定频率档。</li>
+<li>模拟量 0-10V / 4-20mA:连续无级调速。</li>
+<li>通讯给定:Modbus / Profinet 写频率。</li>
+</ul>
+
+<h4>④ 伺服与步进</h4>
+<ul><li>伺服:闭环控制位置 / 速度 / 转矩,带编码器,精度高。</li><li>步进:开环,便宜,负载突变时可能丢步。</li></ul>
+`,
+    tasks:[
+      {type:'学', text:'变频器参数、多段速、模拟量调速、伺服/步进基础', xp:60},
+      {type:'练', text:'用 PLC 控制变频器实现三段速运行', xp:90},
+      {type:'过', text:'通关:独立整定变频器并和 PLC 联调', xp:150},
+    ],
+    quiz:[
+      {q:'变频器调速的本质是改变电机的什么?', options:['直流电阻','供电频率','绕组匝数','极对数'], answer:1, explain:'改变供电频率从而改变同步转速,实现调速(V/F 控制)。'},
+      {q:'用 PLC 控制变频器做"多段速",常用什么信号?', options:['数字量端子组合','只看电流','接地','机械手柄'], answer:0, explain:'用几个多段速端子的通断组合,选择预设的固定频率档。'},
+      {q:'0-10V 模拟量给定通常用于?', options:['开关','连续无级调速','报警','照明'], answer:1, explain:'模拟量可连续对应频率给定,实现平滑调速。'},
+      {q:'伺服与变频调速的本质区别是?', options:['颜色不同','伺服通常闭环控制位置/速度/转矩,精度高','伺服不会转','变频器更准'], answer:1, explain:'伺服带编码器反馈闭环控制,定位精度高;变频器多用于开环调速。'},
+      {q:'变频器多段速通常靠什么选择频率档?', options:['1 个端子','多个数字端子的通断组合','看电流','机械手柄'], answer:1, explain:'用 2~3 个多段速端子的通断组合,可得到 3~7 个固定频率档。'},
+      {q:'V/F 控制中,频率上升时电压一般?', options:['不变','成比例上升','下降','为零'], answer:1, explain:'保持 V/F 恒定,低频时电压也相应降低,避免磁饱和、维持转矩。'},
+      {q:'普通异步电机用变频器长时间低速运行的隐患是?', options:['没事','自扇冷风量不足,电机易过热','更省电','电压升高'], answer:1, explain:'普通电机低速时散热差易过热,需加强散热或用变频专用电机。'},
+      {q:'伺服系统里编码器的作用是?', options:['调色','反馈实际位置/速度,构成闭环','整流','报警'], answer:1, explain:'编码器把实际位置/速度反馈给驱动器,实现闭环精确控制。'},
+      {q:'步进电机典型的运行问题是?', options:['丢步','漏电','变色','无声音'], answer:0, explain:'步进为开环,负载突变或速度过高时可能丢步/失步,需留余量。'},
+      {q:'用 4-20mA 给变频器做频率给定,通常对应关系是?', options:['4mA 对应最低频率,20mA 对应最高频率','固定不变','反比对应','没有关系'], answer:0, explain:'通常 4mA 对应频率下限、20mA 对应上限,线性对应实现无级调速。'},
+      {type:'calc', q:'4 极异步电机(同步转速 1500 r/min),变频器输出 25Hz 时转速约为多少 r/min?(忽略转差)', answer:750, unit:'r/min', tol:20, explain:'n=60f/p=60×25/2=750 r/min。'},
+      {type:'calc', q:'变频器 0-10V 对应 0-50Hz,给定 6V 时输出频率是多少 Hz?', answer:30, unit:'Hz', tol:1, explain:'(6/10)×50=30Hz。'},
+      {kind:'logic', q:'变频器一启动就跳过流,负载却正常,最应先查什么?', options:['加速时间太短或转矩提升不足、参数不匹配','指示灯颜色','按钮','电脑'], answer:0, explain:'常见过流原因:加速时间过短、转矩提升不足、负载卡阻或参数不匹配。'},
+      {kind:'logic', q:'用一台变频器同时带两台不同功率的电机,通常?', options:['可以随意','不建议,两电机需独立控制与保护,宜各用一台变频器','更省电','没问题'], answer:1, explain:'一拖二需两电机完全同步且同负载,否则保护与控制难以兼顾。'},
+    ]},
+  { id:9, tier:'purple', title:'通讯与上位机', sub:'Modbus · Profinet · HMI', 
+    teach:`
+<h4>① Modbus 入门</h4>
+<p>最通用的工业协议,主从结构,物理层常 RS-485 或以太网。</p>
+<diagram id="modbus"/>
+<key>报文 = 站号 + 功能码 + 数据 + CRC 校验。</key>
+
+<h4>② 功能码</h4>
+<ul>
+<li>01 读线圈、02 读离散输入、03 读保持寄存器、04 读输入寄存器。</li>
+<li>05 写单线圈、06 写单寄存器、10 写多寄存器。</li>
+</ul>
+
+<h4>③ 工业以太网与 HMI</h4>
+<ul><li>Profinet(西门子)、EtherNet/IP(AB)、EtherCAT(倍福)。</li><li>HMI:控件绑定 PLC 变量,实现操作与显示。</li></ul>
+
+<h4>④ 排错:分层定位</h4>
+<diagram id="layers"/>
+<warn>通讯不通别急着换设备 —— 从下往上查:先接线,再参数,再看协议,最后看数据。</warn>
+`,
+    tasks:[
+      {type:'学', text:'Modbus、Profinet、Ethernet/IP、HMI 组态、SCADA 入门', xp:60},
+      {type:'练', text:'写一段 Modbus 读变频器频率的报文并解释', xp:90},
+      {type:'过', text:'通关:让 PLC、变频器、HMI 三者通上', xp:150},
+    ],
+    quiz:[
+      {q:'Modbus 读取保持寄存器的功能码是?', options:['01','03','06','10'], answer:1, explain:'03=读保持寄存器;06=写单个;10=写多个;01=读线圈。'},
+      {q:'Modbus 常见的物理层是?', options:['RS-485 或以太网','光驱','USB 打印机线','仅蓝牙'], answer:0, explain:'Modbus 常跑在 RS-485 串行总线上,也有 Modbus TCP 走以太网。'},
+      {q:'通讯连不上,正确的排查思路是?', options:['直接换设备','分层排查:物理层→参数→协议→应用','重启手机','弃用'], answer:1, explain:'自下而上分层定位,先确认接线供电,再查地址波特率,再查协议与应用。'},
+      {q:'HMI 是什么?', options:['电机','人机界面','传感器','变频器'], answer:1, explain:'HMI=Human Machine Interface,用于操作、显示,变量与 PLC 对应。'},
+      {q:'Modbus 写单个保持寄存器的功能码是?', options:['03','06','10','01'], answer:1, explain:'06=写单个保持寄存器;03=读保持寄存器;10=写多个;01=读线圈。'},
+      {q:'Modbus RTU 报文末尾通常带什么?', options:['颜色','CRC 校验','密码','时间戳'], answer:1, explain:'RTU 用 CRC16 校验,保证数据在传输中的正确性。'},
+      {q:'Modbus 从站地址的作用是?', options:['装饰','在同一总线上区分不同设备','表示电压','表示频率'], answer:1, explain:'一条 485 总线上挂多台设备,靠站号区分,主站按站号访问。'},
+      {q:'Profinet 属于哪一类?', options:['串行总线','工业以太网协议','蓝牙','红外'], answer:1, explain:'Profinet 是基于以太网的工业实时通讯协议,用于高速组网。'},
+      {q:'通讯双方波特率不一致会导致?', options:['通讯正常','通讯失败或乱码','电压升高','更省电'], answer:1, explain:'收发双方波特率必须一致,否则数据错乱、通讯失败。'},
+      {q:'HMI 画面上的按钮与 PLC 怎么关联?', options:['无关','通过变量地址关联,操作即读写 PLC','只是装饰','控制颜色'], answer:1, explain:'HMI 控件绑定 PLC 变量地址,实现操作下发和状态显示。'},
+      {type:'calc', q:'Modbus RTU,8 数据位、无校验、1 停止位,传送 1 个字节约需多少位?(含起始位)', answer:10, unit:'位', tol:0.1, explain:'8 数据位 + 1 起始 + 1 停止 = 10 位/字节(无校验)。'},
+      {type:'calc', q:'波特率 9600bps,按 10 位/字节估算,每秒最多约传多少字节?', answer:960, unit:'字节', tol:20, explain:'9600 ÷ 10 = 960 字节/秒。'},
+      {kind:'logic', q:'PLC 和变频器 Modbus 通讯不上,最合理的排查顺序是?', options:['先查协议代码','先查接线/供电→波特率/站号→协议→应用','直接换设备','重启'], answer:1, explain:'自下而上分层:物理层→通讯参数→协议→应用,逐步定位。'},
+      {kind:'logic', q:'主站发了报文却一直收不到从站应答,最不可能的原因是?', options:['接线错误','站号不匹配','波特率不一致','从站指示灯颜色'], answer:3, explain:'指示灯颜色无关;接线、站号、波特率都是常见无应答原因。'},
+    ]},
+  { id:10, tier:'purple', title:'系统设计实战 · 毕业关', sub:'完整系统 · 安全回路 · 规范', 
+    teach:`
+<h4>① 设计从哪里开始</h4>
+<diagram id="design"/>
+<key>先明确工艺和控制要求,再展开系统图、I/O 表、选型、程序。</key>
+
+<h4>② 安全回路</h4>
+<p>急停、安全门接<b>硬线安全回路</b>,直接切断危险动力,用常闭触点。</p>
+<ul><li>急停要<b>手动复位(锁定式)</b>,不能自动恢复。</li></ul>
+<warn>不能只靠 PLC —— PLC 也可能故障,安全回路必须独立、可靠。</warn>
+
+<h4>③ I/O 分配表</h4>
+<p>明确每个输入 / 输出对应的地址、元件和功能,是编程和接线的共同依据。</p>
+
+<h4>④ 规范与失效安全</h4>
+<ul>
+<li>接地、保护、线色、标识遵循 GB / IEC 标准(如黄绿双色 = 保护接地 PE)。</li>
+<li><b>失效安全</b>:元件故障时系统进入安全状态(如断电即停)。</li>
+</ul>
+
+<h4>⑤ 系统化排故</h4>
+<ol>
+<li>先观察现象、确认范围和条件。</li>
+<li>分层定位:电源 → 控制回路 → 主回路 → 负载 → 机械。</li>
+<li>用万用表逐点测量,缩小范围,不靠猜。</li>
+</ol>
+`,
+    tasks:[
+      {type:'学', text:'完整系统设计、安全回路、规范合规(GB/IEC)、系统化排故', xp:100},
+      {type:'练', text:'从零设计一台完整设备的电气系统', xp:150},
+      {type:'过', text:'通关:拿出一个能交付给客户的完整方案', xp:250},
+    ],
+    quiz:[
+      {q:'急停按钮应接入?', options:['PLC 普通输入即可','硬线安全回路','指示灯','零线'], answer:1, explain:'急停要直接切断危险动力,走硬线安全回路,不能只依赖 PLC。'},
+      {q:'设计电气系统通常第一步做什么?', options:['先选颜色','先明确控制要求和工艺','先买元件','先写程序'], answer:1, explain:'先搞清楚要控制什么、达到什么效果,才能展开系统图、I/O、选型和程序。'},
+      {q:'I/O 分配表的作用是?', options:['装饰','明确每个输入输出对应的地址和元件','测电压','报税'], answer:1, explain:'I/O 表是编程与接线的共同依据,让全场信号对应清晰。'},
+      {q:'安全回路为什么常用硬线而非仅靠 PLC?', options:['硬线便宜','PLC 可能故障,硬线更可靠','硬线好看','没区别'], answer:1, explain:'独立硬线安全回路不依赖 PLC 运行,即使 PLC 故障也能安全停机。'},
+      {q:'安全门开关通常用常闭接入安全回路,原因是?', options:['颜色需要','断线或开门都能可靠切断危险','常开不能停','更便宜'], answer:1, explain:'常闭串联,门开或线路断开都会切断回路,符合失效安全原则。'},
+      {q:'I/O 分配表一般在什么阶段做?', options:['调试最后','系统图之后、编程和画图之前','交付以后','从不做'], answer:1, explain:'先定 I/O 表,才能据此画原理图、接线和编程,是整个设计的枢纽。'},
+      {q:'“失效安全”原则是指?', options:['元件坏掉时系统也能进入安全状态','坏掉就随便','越贵越安全','不需要保护'], answer:0, explain:'设计成元件失效时进入安全状态(如断电即停),而不是危险状态。'},
+      {q:'规范中线色的常见约定是?', options:['随便接','如黄绿双色专作保护接地(PE)','都用红色','都用黑色'], answer:1, explain:'如黄绿双色专用于保护接地,火线/零线也有约定,便于维护和排查。'},
+      {q:'系统化排故的第一步通常是?', options:['换设备','先观察现象、确认出现范围和条件','拆线','断电走人'], answer:1, explain:'先弄清“什么情况下出现、范围多大”,再分层缩小,避免瞎换件。'},
+      {q:'交付一套电气方案时,通常应包含?', options:['只给程序','图纸 + I/O 表 + 程序 + 选型/说明书等','只给口头说明','一张照片'], answer:1, explain:'完整交付含原理/接线图、I/O 表、程序、选型清单和使用说明书等。'},
+      {type:'calc', q:'急停回路要求切断时间不超过 0.5s。安全继电器响应 0.2s,接触器释放 0.15s,总切断时间是多少 s?', answer:0.35, unit:'s', tol:0.02, explain:'0.2+0.15=0.35s,满足 ≤0.5s。'},
+      {type:'calc', q:'设备有 24 个数字输入,选用每模块 16 路输入的模块,至少需要几个模块?', answer:2, unit:'个', tol:0.1, explain:'24÷16=1.5,向上取整=2 个模块。'},
+      {kind:'logic', q:'设计新设备,先画系统图还是先写 PLC 程序?为什么?', options:['先写程序','先画系统图/定 I/O,再编程——接口定了程序才有依据','都可以','先接线'], answer:1, explain:'先明确工艺、系统结构、I/O 分配,程序才有正确的输入输出依据。'},
+      {kind:'logic', q:'客户要求“急停后必须彻底断电且不能自动恢复”。安全回路应设计为?', options:['自动复位','手动复位(锁定式),需人工复位才能再启动','无所谓','靠软件复位'], answer:1, explain:'锁定式手动复位可防止意外自动恢复,符合“必须人工确认”的安全要求。'},
+    ]},
+];
+
+const ACHIEVEMENTS = [
+  { id:'first', ic:'👣', name:'千里之行', desc:'完成第一个任务', test:s=>Object.keys(s.done).length>=1 },
+  { id:'lv3',   ic:'🔧', name:'元件行家', desc:'通关 Lv3 元器件认知', test:s=>levelDone(LEVELS[2]) },
+  { id:'mid',   ic:'🎯', name:'越过分水岭', desc:'通关 Lv5 计算与选型', test:s=>levelDone(LEVELS[4]) },
+  { id:'plc',   ic:'⚡', name:'会编程了', desc:'通关 Lv6 PLC 入门', test:s=>levelDone(LEVELS[5]) },
+  { id:'all',   ic:'🏆', name:'电气工程师', desc:'通关全部 10 关', test:s=>LEVELS.every(levelDone) },
+  { id:'streak7', ic:'🔥', name:'坚持一周', desc:'连续打卡 7 天', test:s=>s.checkin.streak>=7 },
+  { id:'quiz20', ic:'🧠', name:'学而时习', desc:'答对 20 道题', test:s=>correctCount()>=20 },
+  { id:'clear', ic:'✨', name:'错题清零', desc:'答过题且错题本为空', test:s=>quizAttempted()>=1 && Object.keys(s.wrong).length===0 },
+];
+
+/* ==================== 知识库数据 ==================== */
+const KNOWLEDGE = [
+  { id:'basic', icon:'⚡', name:'电学基础', items:[
+    { id:'k-ohm', t:'欧姆定律', kw:'电压 电流 电阻 U IR 欧姆', body:`<p><b>欧姆定律</b>:U = I × R(电压 = 电流 × 电阻)。</p><ul><li>已知两个量可求第三个:I=U/R,R=U/I。</li><li>电压(V)是“推动力”,电流(A)是“流量”,电阻(Ω)是“阻碍”。</li><li>例:12V 加在 6Ω 上 → I=12/6=2A。</li></ul>` },
+    { id:'k-power', t:'电功率与电能', kw:'功率 电能 kWh 瓦 度 P UI', body:`<p><b>电功率</b>:P = U × I(瓦)。<b>电能</b> W = P × t,1kWh = 一度电。</p><ul><li>单相:220V×10A = 2200W = 2.2kW。</li><li>三相:P=√3×U线×I×cosφ。</li><li>发热功率 P=I²R,与电流平方成正比。</li></ul>` },
+    { id:'k-sp', t:'串联与并联', kw:'串并联 串联 并联 电阻', body:`<p><b>串联</b>:电流相同,电压分配,总电阻相加 R=R1+R2。</p><p><b>并联</b>:电压相同,电流分配,1/R=1/R1+1/R2;两个相等电阻并联后减半。</p><ul><li>串联一处断全断;并联各支路独立。</li></ul>` },
+    { id:'k-acdc', t:'直流与交流', kw:'直流 交流 DC AC 有效值 峰值 频率', body:`<ul><li><b>直流(DC)</b>:方向不变,如电池、开关电源输出。</li><li><b>交流(AC)</b>:方向周期变化,中国工频 50Hz。</li><li>交流有<b>有效值</b>(220V 即有效值),峰值≈1.414×有效值。</li></ul>` },
+    { id:'k-3phase', t:'三相电入门', kw:'三相 线电压 相电压 星形 三角 380 220', body:`<p>三相电三根相线相位互差 120°。<b>线电压</b>=√3×<b>相电压</b>(380V×220V)。</p><ul><li>星形(Y):线电压 380,相电压 220。</li><li>三角形(△):线电压=相电压。</li><li>三相能产生旋转磁场,驱动三相电机,转矩平稳。</li></ul>` },
+    { id:'k-pf', t:'功率因数与无功补偿', kw:'功率因数 cosφ 无功 补偿 电容', body:`<p><b>功率因数 cosφ</b> = 有功 / 视在。越低,无功越多,供电效率越差。</p><ul><li>感性负载(电机、变压器)拉低 cosφ。</li><li>补偿:并联电容器就地补偿。</li><li>电压×电流=视在功率,再乘 cosφ 才是有功。</li></ul>` },
+  ]},
+  { id:'draw', icon:'📐', name:'识图与符号', items:[
+    { id:'k-symbol', t:'常用电气符号速查', kw:'符号 QF KM FR KA SB KT 线圈 触点', body:`<ul><li>QF 断路器,KM 接触器,FR 热继电器,KA 中间继电器,SB 按钮,KT 时间继电器,M 电机,HL 指示灯,QS 隔离开关,FU 熔断器,TA 电流互感器。</li><li>触点:常开 NO(断开)、常闭 NC(带斜线)。</li><li>线圈用方框表示。</li></ul>` },
+    { id:'k-mainctl', t:'主回路与控制回路', kw:'主回路 控制回路 大电流 小电流', body:`<ul><li><b>主回路</b>:电源→断路器→接触器主触点→热继→电机,走大电流。</li><li><b>控制回路</b>:按钮、线圈、辅助触点,走小电流,决定主回路通断。</li></ul>` },
+    { id:'k-dgtypes', t:'系统图/原理图/接线图', kw:'系统图 原理图 接线图 端子图', body:`<ul><li><b>系统图</b>:整体供电结构关系(宏观)。</li><li><b>原理图</b>:控制逻辑,谁控制谁。</li><li><b>接线图/端子图</b>:现场实际接线位置(线号、端子号)。</li></ul>` },
+    { id:'k-read', t:'怎样读一张控制原理图', kw:'读图 识图 方法 步骤', body:`<ol><li>先看主回路:电机、断路器、接触器、热继。</li><li>再看控制回路:谁给线圈供电,串了哪些保护触点。</li><li>找自锁、互锁、停止、急停。</li><li>最后对照 I/O 表或元件表确认。</li></ol>` },
+    { id:'k-wireno', t:'线号与端子编号', kw:'线号 端子号 线色 编号', body:`<ul><li>线号唯一标识一根线,端子号标识接点位置。</li><li>同一根线两端线号相同,便于排查。</li><li>线色约定:黄绿双色=保护接地 PE,一般不作相线。</li></ul>` },
+  ]},
+  { id:'device', icon:'🔌', name:'低压电器元件', items:[
+    { id:'k-qf', t:'断路器 QF', kw:'断路器 空开 过载 短路 分断', body:`<p>断路器(QF):手动分合 + 过载/短路保护。</p><ul><li>用于主回路总开关或支路。</li><li>有 C 型(照明)、D 型(电机,抗启动冲击)。</li><li>不是越大越好,要与负载匹配。</li></ul>` },
+    { id:'k-km', t:'接触器 KM', kw:'接触器 线圈 主触点 辅助触点 频繁', body:`<p>接触器(KM):线圈小电流控制主触点大电流,可频繁通断。</p><ul><li>主触点接主回路;辅助触点(常开/常闭)接控制回路。</li><li>选型看负载电流/功率、使用类别、通断频次。</li></ul>` },
+    { id:'k-fr', t:'热继电器 FR', kw:'热继电器 过载 整定 双金属片', body:`<p>热继电器(FR):电机过载保护。</p><ul><li>双金属片受热变形,超过整定值推动常闭触点断开控制回路。</li><li>整定电流≈电机额定电流;过载动作后可手动复位。</li><li>不做短路保护(短路靠断路器/熔断器)。</li></ul>` },
+    { id:'k-ka', t:'中间继电器 KA', kw:'中间继电器 信号 触点扩展 隔离', body:`<p>中间继电器(KA):信号传递、触点扩展、逻辑隔离。</p><ul><li>触点容量小,不能直接驱动大负载,常用于控制接触器线圈或传递信号。</li></ul>` },
+    { id:'k-btn', t:'按钮与指示灯', kw:'按钮 常开 常闭 指示灯 启动 停止', body:`<ul><li>启动按钮用<b>常开</b>(按下接通)。</li><li>停止按钮用<b>常闭</b>(串在回路,按下断开),断线也能停更安全。</li><li>指示灯做状态反馈:运行绿、停止红、报警黄等。</li></ul>` },
+    { id:'k-sensor', t:'接近开关与传感器', kw:'接近开关 传感器 NPN PNP 光电 电感', body:`<ul><li>接近开关:非接触检测位置,无磨损、寿命长。</li><li>分电感式(金属)、电容式(多种)、光电式。</li><li>输出分 NPN/PNP,接 PLC 输入要注意极性。</li></ul>` },
+    { id:'k-fuse', t:'熔断器 FU', kw:'熔断器 保险 短路', body:`<ul><li>熔断器(FU):短路保护,靠熔丝熔断。</li><li>一次性,熔断后需更换;常与断路器配合。</li></ul>` },
+  ]},
+  { id:'logic', icon:'🧩', name:'继电控制逻辑', items:[
+    { id:'k-hold', t:'启保停(自锁)', kw:'启保停 自锁 启动 停止', body:`<p><b>启保停(自锁)</b>:按下启动 SB2 → 接触器 KM 得电 → KM 常开辅助触点闭合“锁住”自己 → 松手仍通电。</p><ul><li>停止 SB1 用常闭串联,按下断开回路即停。</li><li>口诀:启动(常开)∥自锁(常开),再串停止(常闭)。</li></ul>` },
+    { id:'k-interlock', t:'互锁', kw:'互锁 连锁 短路 防止同时', body:`<p><b>互锁</b>:两个接触器不能同时吸合(会短路),各串入对方常闭触点。</p><ul><li>再加机械互锁(双方机械卡扣)更可靠。</li></ul>` },
+    { id:'k-fwdrev', t:'电机正反转', kw:'正反转 换相 互锁 KM1 KM2', body:`<ul><li>用两个接触器 KM1(正转)、KM2(反转),交换任意两相实现反转。</li><li>必须电气互锁 + 机械互锁,防止同时吸合造成相间短路。</li></ul>` },
+    { id:'k-stardelta', t:'星三角降压启动', kw:'星三角 降压启动 启动电流 时间继电器', body:`<ul><li>启动时绕组接星形,相电压降为 1/√3,启动电流降到约 1/3。</li><li>延时(时间继电器)后切换成三角全压运行。</li><li>适合轻载/空载启动的大功率电机。</li></ul>` },
+    { id:'k-seq', t:'顺序控制与连锁', kw:'顺序 连锁 步序 完成信号', body:`<ul><li>用前一步的完成信号(限位、定时、传感器)去启动下一步。</li><li>停机可逆序,形成连锁。</li><li>核心:每步有明确的转入/转出条件,防止跳步、乱步。</li></ul>` },
+    { id:'k-jog', t:'点动控制', kw:'点动 微调 无自锁', body:`<ul><li>点动:按住才动,松开即停(无自锁)。</li><li>常用于对刀、调试、微调位置。</li></ul>` },
+  ]},
+  { id:'calc', icon:'🧮', name:'计算与选型', items:[
+    { id:'k-motor-i', t:'电机额定电流计算', kw:'电机 额定电流 公式 功率', body:`<p>三相电机额定电流:</p><p><code>I = P / (√3 × U × cosφ × η)</code></p><ul><li>经验“1kW≈2A”(380V)。</li><li>例:7.5kW、cosφ0.85、η0.9 → I≈15A。</li></ul>` },
+    { id:'k-wire', t:'导线截面积与载流量', kw:'线径 截面积 载流量 平方 铜线', body:`<ul><li>按<b>载流量</b>选截面积(与敷设方式、环境温度、并敷根数有关)。</li><li>参考:1.5mm²≈10A,2.5mm²≈16-20A,4mm²≈25A,6mm²≈32A(仅参考,以手册为准)。</li><li>再校核压降与短路热稳定。</li></ul>` },
+    { id:'k-vdrop', t:'线路压降', kw:'压降 电压损失 距离 ΔU', body:`<p>线路压降 ΔU ≈ I × R线路(单相往返要乘 2)。</p><ul><li>一般要求末端压降 ≤5%。线越长、电流越大、线越细,压降越大。</li></ul>` },
+    { id:'k-breaker', t:'断路器选型', kw:'断路器 选型 整定 倍数', body:`<ul><li>额定电流略大于负载电流(电机取 1.2~1.5 倍并配合启动)。</li><li>还要满足短路分断能力 ≥ 安装处短路电流。</li><li>过大会失去保护,过小会频繁误跳。</li></ul>` },
+    { id:'k-contactor', t:'接触器与热继选型', kw:'接触器 热继 选型 使用类别 AC-3', body:`<ul><li>接触器按负载功率/电流等级、使用类别(AC-3 电机)、通断频率选。</li><li>热继整定≈电机额定电流;三角启动内侧热继注意接法。</li></ul>` },
+    { id:'k-short', t:'短路电流与保护配合', kw:'短路电流 分断能力 选择性 配合', body:`<ul><li>短路电流用于选保护电器的分断能力和校核电缆热稳定。</li><li>需配合:上、下级保护有选择性,避免一起跳。</li></ul>` },
+  ]},
+  { id:'plc', icon:'🖥️', name:'PLC 可编程控制器', items:[
+    { id:'k-plc-what', t:'PLC 是什么', kw:'PLC 构成 输入 输出 CPU 模块', body:`<p>PLC(可编程逻辑控制器):用程序实现控制逻辑,替代继电器盘。</p><ul><li>构成:电源、CPU、输入模块、输出模块、通讯口。</li><li>输入(X/%I)、输出(Y/%Q)、中间(M)、定时(T)、计数(C)。</li></ul>` },
+    { id:'k-plc-scan', t:'扫描机制', kw:'扫描 周期 采样 刷新 映像区', body:`<p>循环执行:<b>输入采样 → 程序执行 → 输出刷新</b>,周期几毫秒。</p><ul><li>程序读的是输入映像区快照,保证同周期逻辑一致。</li></ul>` },
+    { id:'k-plc-ladder', t:'梯形图基础', kw:'梯形图 触点 线圈 自锁 常闭', body:`<ul><li>触点、线圈、并串联,和继电器逻辑一一对应。</li><li>自锁:输出常开触点并联启动触点。</li><li>常闭触点用于停止、互锁(信号 0 时导通)。</li></ul>` },
+    { id:'k-plc-timer', t:'定时器与计数器', kw:'定时器 计数器 TON TOF CTU CTD', body:`<ul><li>TON 通电延时、TOF 断电延时、TP 脉冲。</li><li>CTU 加计数、CTD 减计数。</li><li>定时时间=设定值×时基。</li></ul>` },
+    { id:'k-plc-state', t:'顺序/状态机控制', kw:'状态机 步序 流程 超时', body:`<ul><li>用“步(Step)”描述流程,当前步满足条件才进下一步。</li><li>每步设超时监控,避免卡死。</li><li>工业控制最常用、最清晰的写法。</li></ul>` },
+    { id:'k-plc-analog', t:'模拟量处理', kw:'模拟量 4-20mA 0-10V 量程 换算', body:`<ul><li>信号:4-20mA、0-10V、0-20mA;对应工程量(温度/压力/频率)。</li><li>4mA 常为量程下限(活零点),便于断线检测。</li><li>工程量=(原始值-下限)/(上限-下限)×量程范围。</li></ul>` },
+    { id:'k-plc-pid', t:'PID 入门', kw:'PID 比例 积分 微分 超调 稳态', body:`<ul><li>P 比例:按偏差响应,快但可能超调。</li><li>I 积分:消除稳态误差。</li><li>D 微分:抑制超调、预判趋势。</li><li>温控、压力、流量常用;整定可从 P 起。</li></ul>` },
+    { id:'k-plc-brand', t:'常用品牌与软件', kw:'西门子 三菱 AB CODESYS TIA 博途', body:`<ul><li>西门子:S7-1200/1500,TIA Portal(博途),SCL/梯形图。</li><li>罗克韦尔(AB):Studio 5000,梯形图/ST。</li><li>三菱 GX Works;欧姆龙 Sysmac;施耐德 EcoStruxure;倍福 TwinCAT。</li><li>通用/开源:CODESYS、OpenPLC。</li></ul>` },
+  ]},
+  { id:'drive', icon:'⚙️', name:'变频器与传动', items:[
+    { id:'k-vfd', t:'变频器原理与 V/F', kw:'变频器 V/F 频率 调速 磁饱和', body:`<ul><li>改变供电频率调速,保持 V/F 恒定。</li><li>低频时电压也降低,避免磁饱和。</li></ul>` },
+    { id:'k-vfd-param', t:'变频器参数设置', kw:'参数 加速 减速 转矩提升 保护', body:`<ul><li>关键参数:额定电压/电流/频率、上限频率、加速/减速时间、转矩提升、保护。</li><li>加速时间太短易跳过流,太长影响效率。</li><li>普通电机低速自冷差,长时间低速要散热。</li></ul>` },
+    { id:'k-vfd-speed', t:'多段速与模拟量调速', kw:'多段速 模拟量 给定 端子', body:`<ul><li>多段速:几个数字端子组合选固定频率档。</li><li>模拟量 0-10V/4-20mA:连续无级调速。</li><li>通讯给定:通过 Modbus/Profinet 写频率。</li></ul>` },
+    { id:'k-servo', t:'伺服与步进', kw:'伺服 步进 闭环 开环 编码器 定位', body:`<ul><li>伺服:闭环控制位置/速度/转矩,带编码器,精度高。</li><li>步进:开环,便宜,可能丢步。</li><li>常用于定位、同步、精密运动。</li></ul>` },
+    { id:'k-brake', t:'制动与刹车', kw:'制动 刹车 电阻 抱闸', body:`<ul><li>减速停车、制动电阻消耗再生能量。</li><li>机械抱闸用于断电保持位置。</li></ul>` },
+  ]},
+  { id:'comm', icon:'🌐', name:'通讯与上位机', items:[
+    { id:'k-modbus', t:'Modbus 入门', kw:'Modbus 主从 RS485 通讯', body:`<ul><li>最通用的工业协议,主从结构。</li><li>物理层常 RS-485 或以太网(Modbus TCP)。</li><li>报文:站号+功能码+数据+CRC。</li></ul>` },
+    { id:'k-modbus-f', t:'功能码与报文', kw:'功能码 03 06 10 报文 寄存器', body:`<ul><li>01 读线圈、02 读离散输入、03 读保持寄存器、04 读输入寄存器。</li><li>05 写单线圈、06 写单寄存器、10 写多寄存器。</li><li>寄存器地址分 0x/1x/3x/4x 区。</li></ul>` },
+    { id:'k-fieldbus', t:'Profinet / EtherNet-IP', kw:'Profinet EtherNet IP EtherCAT 工业以太网', body:`<ul><li>Profinet(西门子系)、EtherNet/IP(AB 系)、EtherCAT(倍福系)。</li><li>工业以太网,实时性强,用于设备高速组网。</li></ul>` },
+    { id:'k-hmi', t:'HMI 组态要点', kw:'HMI 触摸屏 组态 画面 变量', body:`<ul><li>控件绑定 PLC 变量地址,实现操作与显示。</li><li>画面结构:主画面、参数、报警、趋势。</li></ul>` },
+    { id:'k-scada', t:'上位机与 SCADA', kw:'SCADA 上位机 监控 报表 OPC', body:`<ul><li>上位机/SCADA:集中监控、数据记录、报警、报表。</li><li>架构:现场设备→PLC→上位机,常用 OPC、数据库。</li></ul>` },
+    { id:'k-comm-debug', t:'通讯排错', kw:'通讯 排错 分层 波特率 站号', body:`<ul><li>分层排查:物理层(接线/供电)→参数(波特率/站号/校验)→协议→应用。</li><li>先确认线、再确认参数,最后看数据。</li></ul>` },
+  ]},
+  { id:'safety', icon:'🦺', name:'安全与规范', items:[
+    { id:'k-ground', t:'接地与保护接地', kw:'接地 PE 漏电 黄绿双色', body:`<ul><li>PE 保护接地:设备外壳接地,漏电时快速跳闸。</li><li>黄绿双色线专用于 PE。</li><li>接地电阻要满足规范要求。</li></ul>` },
+    { id:'k-estop', t:'安全回路与急停', kw:'急停 安全回路 硬线 常闭 复位', body:`<ul><li>急停接<b>硬线安全回路</b>,直接切断危险动力,用常闭触点。</li><li>手动复位(锁定式),不能自动恢复。</li><li>不能只靠 PLC(PLC 也可能故障)。</li></ul>` },
+    { id:'k-failsafe', t:'失效安全原则', kw:'失效安全 常闭 断线 安全状态', body:`<ul><li>失效安全:元件故障时系统进入安全状态(如断电即停)。</li><li>安全回路用常闭串联(断线=安全)。</li></ul>` },
+    { id:'k-safeop', t:'电气安全操作', kw:'安全操作 验电 挂牌 接地线 停电', body:`<ul><li>停电、验电、挂牌、装设接地线、遮拦、专人监护。</li><li>操作高压必须持证、按规程。</li><li>带电作业风险高,能停电就停电。</li></ul>` },
+    { id:'k-std', t:'常用规范标准', kw:'GB IEC 标准 规范', body:`<ul><li>GB(国标)、IEC(国际)、行业标准。</li><li>如 IEC 60204 机械电气安全、GB 50054 低压配电设计。</li><li>设计、施工、验收都有对应规范。</li></ul>` },
+    { id:'k-ip', t:'防护等级 IP', kw:'IP 防护 防尘 防水 IP54 IP65', body:`<ul><li>IP 防护等级:第一位防尘(0-6),第二位防水(0-8)。</li><li>如 IP54(防尘+防溅)、IP65(防尘+防喷)、IP67(防浸泡)。</li></ul>` },
+  ]},
+  { id:'tool', icon:'🧰', name:'仪表与工具', items:[
+    { id:'k-multimeter', t:'万用表', kw:'万用表 电压 电流 电阻 档位', body:`<ul><li>测电压(并接)、电流(串接)、电阻(断电测)、通断。</li><li>先选档位,注意交直流。</li><li>电流档误测电压会烧表/短路,测前看清档位。</li></ul>` },
+    { id:'k-clamp', t:'钳形电流表', kw:'钳形表 不断线 电流 钳口', body:`<ul><li>钳形表不断线测电流,钳口夹单根导线。</li><li>夹多根会抵消;测小电流可选小量程或绕多圈。</li></ul>` },
+    { id:'k-megohm', t:'兆欧表(摇表)', kw:'兆欧表 摇表 绝缘电阻 耐压', body:`<ul><li>测绝缘电阻,输出高压(500V/1000V)。</li><li>必须断电、放电后测;测前拆开电子器件。</li><li>绝缘电阻一般要求 ≥0.5MΩ(低压)。</li></ul>` },
+    { id:'k-phase', t:'相序表', kw:'相序表 相序 电机 反转', body:`<ul><li>测三相相序,判断电机转向。</li><li>相序错会导致电机反转。</li></ul>` },
+    { id:'k-tools', t:'常用工具与安全用品', kw:'工具 验电笔 压线钳 绝缘手套', body:`<ul><li>绝缘工具、验电笔、扳手、压线钳、绝缘手套、护目镜。</li><li>接线端子、冷压头、线号管。</li><li>安全第一:验电、断电、挂牌。</li></ul>` },
+  ]},
+  { id:'practice', icon:'🔧', name:'实战与排故', items:[
+    { id:'k-debug', t:'系统化排故思路', kw:'排故 排查 分层 方法', body:`<ol><li>先观察现象、确认范围和条件(什么时候发生、多大范围)。</li><li>分层定位:电源→控制回路→主回路→负载→机械。</li><li>用万用表逐点测量,缩小范围,不靠猜。</li><li>换件前先确认判断,避免瞎换。</li></ol>` },
+    { id:'k-motor-no', t:'电机不转怎么查', kw:'电机不转 排查 控制回路 主回路', body:`<ul><li>先看控制回路:按下启动,接触器是否吸合?</li><li>不吸合→查控制回路(按钮、热继、互锁、线圈、电源)。</li><li>吸合但不转→查主回路(断路器、接触器主触点、缺相、电机、负载卡阻)。</li></ul>` },
+    { id:'k-km-no', t:'接触器不吸合怎么查', kw:'接触器 不吸合 吸合 线圈 欠压 嗡鸣', body:`<ul><li>查线圈电压是否到位(欠压不吸合或嗡鸣)。</li><li>查串在回路里的常闭:停止按钮、热继、互锁是否断开。</li><li>查线圈/铁芯是否损坏、卡滞。</li></ul>` },
+    { id:'k-trip', t:'跳闸怎么查', kw:'跳闸 过载 短路 漏电 断路器', body:`<ul><li>看是断路器(过载/短路)还是漏电保护动作。</li><li>过载:查负载、电流、选型是否偏小。</li><li>短路:查绝缘、接线、受潮。</li><li>漏电:查对地绝缘、潮湿、线路破损。</li></ul>` },
+    { id:'k-commission', t:'设备调试流程', kw:'调试 单体 联调 点动 带载', body:`<ul><li>先单体调试(每个电器动作正确),再联调。</li><li>点动确认转向、限位、急停有效。</li><li>再空载运行,最后带载运行。</li></ul>` },
+    { id:'k-design', t:'电气设计流程', kw:'设计 流程 系统图 IO表 选型 原理图', body:`<ol><li>明确工艺和控制要求。</li><li>画系统图/供电方案。</li><li>分配 I/O 表。</li><li>选型(断路器、接触器、线径、PLC)。</li><li>画原理图/接线图。</li><li>写程序、调试、交付。</li></ol>` },
+  ]},
+];
+
+/* ==================== 状态 ==================== */
+const KEY='ee_grow_v2';
+let state = load();
+function load(){
+  try{ const s=JSON.parse(localStorage.getItem(KEY)); if(s&&s.done) return s; }catch(e){}
+  return { done:{}, quiz:{}, wrong:{}, checkin:{last:null, streak:0, days:[]}, settings:{sound:true, remind:false, theme:'light', palette:'blue'}, rankIdx:0 };
+}
+function save(){ try{ localStorage.setItem(KEY, JSON.stringify(state)); }catch(e){} }
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', (state.settings&&state.settings.theme)||'light');
+  applyPalette();
+}
+
+/* ==================== 配色方案 ==================== */
+const PALETTES=[['blue','原版蓝','#007aff'],['teal','青绿','#00a6a6'],['green','翠绿','#2e9e4f'],['indigo','靛蓝','#5856d6'],['purple','雅紫','#af52de'],['pink','桃粉','#ff2d55'],['orange','暖橙','#f08c00']];
+function applyPalette(){
+  const id=(state.settings&&state.settings.palette)||'blue';
+  const p=PALETTES.find(x=>x[0]===id)||PALETTES[0];
+  document.documentElement.style.setProperty('--accent', p[2]);
+}
+
+/* ==================== 讲解示意图 ==================== */
+const DG_TITLE={mainctrl:'主回路 vs 控制回路',hold:'启保停(自锁)逻辑',fwdrev:'正反转 + 互锁',scan:'PLC 扫描周期',pid:'PID 闭环',modbus:'Modbus 主从总线',layers:'通讯排错:分层定位',design:'电气设计流程',vf:'变频器 V/F 控制'};
+function dgTitle(id){ return '<div class="dg-title">📊 '+(DG_TITLE[id]||'')+'</div>'; }
+function dgChip(t,hl){ return '<span class="dg-chip'+(hl?' hl':'')+'">'+t+'</span>'; }
+function dgRow(arr){ return '<div class="dg-row">'+arr.join('<span class="dg-arrow">→</span>')+'</div>'; }
+function dgCap(t){ return '<div class="dg-cap">'+t+'</div>'; }
+function dgVert(arr){ return arr.map(s=>'<div class="dg-row">'+dgChip(s)+'</div><div class="dg-vert">↓</div>').join(''); }
+const DIAGRAMS={
+  mainctrl: dgTitle('mainctrl')+dgCap('主回路(大电流)')+dgRow([dgChip('电源'),dgChip('断路器'),dgChip('接触器主触点'),dgChip('热继'),dgChip('电机')])+dgCap('控制回路(小电流,决定主回路通断)')+dgRow([dgChip('按钮 SB'),dgChip('线圈 / 辅助触点'),dgChip('控制接触器')]),
+  hold: dgTitle('hold')+dgRow([dgChip('启动 SB2(常开)'),dgChip('∥'),dgChip('KM 自锁(常开)',1)])+dgCap('↓ 按下后这一路保持通电(自锁)')+dgRow([dgChip('停止 SB1(常闭)'),dgChip('KM 线圈',1),dgChip('电机运行')]),
+  fwdrev: dgTitle('fwdrev')+dgRow([dgChip('KM1 正转'),dgChip('⇄ 互锁'),dgChip('KM2 反转')])+dgCap('两个接触器各串对方的常闭触点 —— 同时只允许一个吸合,防止相间短路')+dgCap('反转 = 交换任意两相'),
+  scan: dgTitle('scan')+dgRow([dgChip('输入采样'),dgChip('程序执行'),dgChip('输出刷新'),dgChip('↻ 循环')])+dgCap('每几毫秒循环一次;程序读的是输入快照,保证同周期一致'),
+  pid: dgTitle('pid')+dgRow([dgChip('设定值'),dgChip('偏差 e'),dgChip('PID 运算',1),dgChip('输出'),dgChip('执行器')])+dgCap('P 快 / I 消稳态误差 / D 抑超调'),
+  modbus: dgTitle('modbus')+'<div class="dg-row">'+dgChip('主站(PLC)')+'</div>'+'<div class="dg-cap" style="margin-left:6px">│ RS-485 / 以太网</div>'+dgRow([dgChip('从站1 变频器'),dgChip('从站2 仪表'),dgChip('从站3 …')]),
+  layers: dgTitle('layers')+dgVert(['物理层(接线/供电)','通讯参数(波特率/站号)','协议(功能码/校验)','应用(数据)'])+dgCap('自下而上查,逐层缩小范围'),
+  design: dgTitle('design')+dgVert(['明确工艺/控制要求','画系统图','分配 I/O 表','选型','画原理图/接线图','写程序·调试·交付']),
+  vf: dgTitle('vf')+'<svg viewBox="0 0 300 150" width="100%" height="150"><line x1="40" y1="130" x2="40" y2="12" style="stroke:var(--sub);stroke-width:2"/><line x1="40" y1="130" x2="292" y2="130" style="stroke:var(--sub);stroke-width:2"/><line x1="40" y1="130" x2="286" y2="16" style="stroke:var(--accent);stroke-width:3"/><text x="2" y="14" font-size="11" fill="#8e8e93">电压</text><text x="246" y="145" font-size="11" fill="#8e8e93">频率 50Hz</text><text x="150" y="58" font-size="12" fill="#007aff" font-weight="bold">V/F 恒定</text></svg>'
+};
+function teachHtml(s){ return String(s).replace(/<diagram\s+id="([^"]+)"\s*\/>/g, '<div class="dgx" data-dg="$1"></div>'); }
+function renderDiagrams(){ document.querySelectorAll('.dgx[data-dg]').forEach(el=>{ el.innerHTML=DIAGRAMS[el.getAttribute('data-dg')]||''; }); }
+
+/* ==================== 测验选项打乱 ==================== */
+let quizOrder={};
+function refreshQuizOrder(id){
+  quizOrder={};
+  const lv=LEVELS.find(l=>l.id===id); if(!lv) return;
+  lv.quiz.forEach((q,qi)=>{
+    if(q.options&&q.options.length){
+      const a=q.options.map((_,i)=>i);
+      for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; }
+      quizOrder[qi]=a;
+    }
+  });
+}
+function todayISO(){ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0'); }
+function daysBetween(a,b){ return Math.round((new Date(b)-new Date(a))/86400000); }
+
+/* ==================== 计算 ==================== */
+function correctCount(){ let n=0; Object.values(state.quiz).forEach(o=>{ n += (o.correct||0); }); return n; }
+function quizAttempted(){ return Object.values(state.quiz).reduce((a,o)=>a+(o.attempted||0),0); }
+function totalXP(){
+  let xp=0;
+  LEVELS.forEach(lv=> lv.tasks.forEach((t,i)=>{ if(state.done[`L${lv.id}-${i}`]) xp+=t.xp; }));
+  xp += correctCount()*8;          // 答对一题 8 XP
+  xp += (state.checkin.streak||0)*5; // 每天连续奖励
+  return xp;
+}
+function levelDone(lv){ return lv.tasks.every((t,i)=> state.done[`L${lv.id}-${i}`]); }
+function levelTaskProg(lv){ return lv.tasks.filter((t,i)=> state.done[`L${lv.id}-${i}`]).length / lv.tasks.length; }
+function levelQuizDone(lv){ const o=state.quiz[lv.id]; return o && o.attempted>=lv.quiz.length; }
+function passedCount(){ return LEVELS.filter(levelDone).length; }
+function rankIndex(xp){ let idx=0; RANKS.forEach((r,i)=>{ if(xp>=r.min) idx=i; }); return idx; }
+function isUnlocked(idx){ return idx===0 || levelDone(LEVELS[idx-1]); }
+function currentLevelIdx(){ const i=LEVELS.findIndex(lv=>!levelDone(lv)); return i<0?LEVELS.length-1:i; }
+
+/* ==================== 音效 ==================== */
+let actx=null;
+function beep(freq, dur, type){
+  if(!state.settings.sound) return;
+  try{
+    actx = actx || new (window.AudioContext||window.webkitAudioContext)();
+    const o=actx.createOscillator(), g=actx.createGain();
+    o.type=type||'sine'; o.frequency.value=freq;
+    o.connect(g); g.connect(actx.destination);
+    g.gain.setValueAtTime(.001, actx.currentTime);
+    g.gain.exponentialRampToValueAtTime(.15, actx.currentTime+.02);
+    g.gain.exponentialRampToValueAtTime(.001, actx.currentTime+dur);
+    o.start(); o.stop(actx.currentTime+dur);
+  }catch(e){}
+}
+function sfxTask(){ beep(660,.12); }
+function sfxLevel(){ beep(523,.15); setTimeout(()=>beep(659,.15),140); setTimeout(()=>beep(784,.28),290); }
+
+/* ==================== 视图路由 ==================== */
+let view='home', viewParam=null, prevView='home';
+function go(v, p){
+  if(v==='quiz'){ quizSel={}; quizSubmitted=false; refreshQuizOrder(p); }
+  if(v!=='detail'&&v!=='quiz'&&v!=='article'){ prevView=v; }
+  view=v; viewParam=p; document.getElementById('view').scrollTop=0; render();
+}
+document.querySelectorAll('.tabbar button').forEach(b=>{
+  b.addEventListener('click', ()=> go(b.dataset.tab));
+});
+
+function setTabs(){
+  let active = view;
+  if(view==='detail'||view==='quiz') active='map';
+  else if(view==='article') active='kb';
+  document.querySelectorAll('.tabbar button').forEach(b=> b.classList.toggle('on', b.dataset.tab===active));
+}
+
+/* ==================== 渲染主入口 ==================== */
+function render(){
+  const before = rankIndex(totalXP());
+  const el=document.getElementById('view');
+  if(view==='home') el.innerHTML=viewHome();
+  else if(view==='map') el.innerHTML=viewMap();
+  else if(view==='detail') el.innerHTML=viewDetail(viewParam);
+  else if(view==='quiz') el.innerHTML=viewQuiz(viewParam);
+  else if(view==='wrong') el.innerHTML=viewWrong();
+  else if(view==='records') el.innerHTML=viewRecords();
+  else if(view==='kb') el.innerHTML=viewKnowledge();
+  else if(view==='article') el.innerHTML=viewArticle(viewParam);
+  setTabs();
+  wire();
+  const after = rankIndex(totalXP());
+  if(after>before && view!=='quiz'){ showLevelUp(after); }
+  else if(after>before){ state.rankIdx=after; save(); }
+}
+
+/* -------- 主页 -------- */
+function viewHome(){
+  const xp=totalXP(), rank=RANKS[rankIndex(xp)], next=RANKS[rankIndex(xp)+1]||null;
+  const pass=passedCount();
+  let pct = next ? (xp-rank.min)/(next.min-rank.min)*100 : 100;
+  pct=Math.max(3,Math.min(100,pct));
+  const li=currentLevelIdx(), lv=LEVELS[li];
+  const allDone=LEVELS.every(levelDone);
+  const streak=state.checkin.streak||0;
+  const checkedToday=state.checkin.last===todayISO();
+
+  return `
+  <div class="wrap">
+    <div class="hero">
+      <div class="t">⚡ 电气工程师养成<small>从装配电工 → 电气工程师</small></div>
+      <div class="rank-row">
+        <div class="rank-icon">${rank.icon}</div>
+        <div style="flex:1">
+          <div class="rank-name">${rank.name}</div>
+          <div class="rank-sub">${xp} XP · 已通关 ${pass}/10 关</div>
+        </div>
+      </div>
+      <div class="bar" style="margin-top:10px"><i style="width:${pct}%"></i></div>
+      <div class="muted" style="font-size:11px;margin-top:6px">
+        ${next?`距「${next.icon} ${next.name}」还差 <b style="color:var(--gold)">${next.min-xp}</b> XP`:'🏆 已达最高境界!'}
+      </div>
+      <div class="stat-grid">
+        <div class="stat"><b>${streak}</b><span>连续打卡</span></div>
+        <div class="stat"><b>${correctCount()}</b><span>答对题数</span></div>
+        <div class="stat"><b>${pass}</b><span>通关数</span></div>
+      </div>
+      <div class="today-tip">
+        ${allDone
+          ? '🎓 全部通关!建议回头刷 <b>错题本</b> 巩固。'
+          : `📌 今天该推进 <b>Lv${lv.id} ${lv.title}</b> —— ${lv.tasks.find((t,i)=>!state.done[`L${lv.id}-${i}`])?.text||''}`}
+      </div>
+      ${allDone?'':`<button class="btn wide" style="margin-top:12px" data-go="detail" data-p="${lv.id}">继续学习 Lv${lv.id} →</button>`}
+    </div>
+
+    <h2 class="sec">今日打卡</h2>
+    <div class="card" style="padding:14px">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div style="font-size:14px;font-weight:700">🔥 连续 ${streak} 天</div>
+          <div class="muted" style="font-size:12px">${checkedToday?'今天已打卡 ✓':'今天还没打卡,别断了!'}</div>
+        </div>
+        <button class="btn" id="checkinBtn" ${checkedToday?'disabled':''}>${checkedToday?'已打卡':'打卡'}</button>
+      </div>
+    </div>
+
+    <h2 class="sec">设置</h2>
+    <div class="card" style="padding:4px 16px">
+      <label class="setrow">
+        <div><div class="st">🌗 深色模式</div></div>
+        <span class="switch"><input type="checkbox" id="toggleTheme" ${state.settings.theme==='dark'?'checked':''}><span></span></span>
+      </label>
+      <label class="setrow">
+        <div><div class="st">🔊 音效</div></div>
+        <span class="switch"><input type="checkbox" id="toggleSound" ${state.settings.sound?'checked':''}><span></span></span>
+      </label>
+      <label class="setrow" style="border-bottom:none">
+        <div><div class="st">🔔 每日提醒</div><div class="ss">需授权通知权限</div></div>
+        <span class="switch"><input type="checkbox" id="toggleRemind" ${state.settings.remind?'checked':''}><span></span></span>
+      </label>
+    </div>
+
+    <h2 class="sec">配色方案</h2>
+    <div class="card" style="padding:16px">
+      <div class="palrow">
+        ${PALETTES.map(p=>`<button class="pchip ${((state.settings.palette||'blue')===p[0])?'on':''}" data-pal="${p[0]}" style="background:${p[2]}" title="${p[1]}"></button>`).join('')}
+      </div>
+      <div class="muted" style="font-size:11.5px;margin-top:10px">当前配色:${(PALETTES.find(p=>p[0]===(state.settings.palette||'blue'))||PALETTES[0])[1]}</div>
+    </div>
+
+    <h2 class="sec">存档</h2>
+    <div class="row" style="gap:8px">
+      <button class="btn ghost" style="flex:1" id="exportBtn">⬇ 导出存档</button>
+      <button class="btn ghost" style="flex:1" id="importBtn">⬆ 导入存档</button>
+      <button class="btn ghost" style="flex:1" id="resetBtn">↺ 重置</button>
+    </div>
+    <input type="file" id="fileInput" accept=".json" style="display:none">
+    <div class="muted center" style="font-size:11px;margin-top:18px">数据存在本机 · 换设备用"导出/导入"</div>
+  </div>`;
+}
+
+/* -------- 地图 -------- */
+function viewMap(){
+  let html=`<div class="wrap"><h2 class="sec" style="margin-top:6px">能力成长地图</h2>`;
+  let lastTier=null;
+  LEVELS.forEach((lv,idx)=>{
+    if(lv.tier!==lastTier){ lastTier=lv.tier; html+=`<div class="tier-label">${TIERS[lv.tier][0]}</div>`; }
+    const un=isUnlocked(idx), done=levelDone(lv), prog=levelTaskProg(lv), color=TIERS[lv.tier][1];
+    html+=`
+    <div class="lv ${un?'':'locked'}" ${un?`data-go="detail" data-p="${lv.id}"`:''} style="border-left-color:${color}">
+      <div class="lv-badge" style="${done?`background:${color};color:#06110a;border-color:${color}`:''}">
+        ${un?(done?'✓':'Lv'+lv.id):'🔒'}
+      </div>
+      <div class="info">
+        <div class="t">${lv.title}${done?'<span class="pass-tag">已通关</span>':''}</div>
+        <div class="s">${un?lv.sub:'完成上一关后解锁'}</div>
+        <div class="mini-bar"><i style="width:${prog*100}%;background:${color}"></i></div>
+      </div>
+      <div style="color:var(--sub)">${un?'›':''}</div>
+    </div>`;
+  });
+  html+=`</div>`;
+  return html;
+}
+
+/* -------- 关卡详情 -------- */
+function viewDetail(id){
+  const lv=LEVELS.find(l=>l.id===id); if(!lv) return `<div class="wrap"><div class="center-empty">未找到</div></div>`;
+  const done=levelDone(lv);
+  const qdone=levelQuizDone(lv);
+  const o=state.quiz[lv.id]||{};
+  let tasks='';
+  lv.tasks.forEach((t,i)=>{
+    const d=state.done[`L${lv.id}-${i}`];
+    const cls=t.type==='学'?'x':(t.type==='练'?'p':'pass');
+    tasks+=`<div class="task ${d?'done':''}" data-task="${i}">
+      <div class="box">✓</div>
+      <div class="txt"><span class="tag ${cls}">${t.type}</span>${t.text}
+        <span class="muted" style="font-size:11px"> +${t.xp}XP</span></div></div>`;
+  });
+  return `<div class="wrap">
+    <div class="topbar">
+      <button class="back" id="backBtn">‹</button>
+      <div><div class="tt">Lv${lv.id} ${lv.title}</div><div class="ts">${lv.sub}</div></div>
+    </div>
+    <h2 class="sec">📖 知识点讲解</h2>
+    <div class="teach">${teachHtml(lv.teach)}</div>
+    <h2 class="sec">✅ 任务清单</h2>
+    <div class="card" style="padding:4px 14px">${tasks}</div>
+    ${done?`<div class="result good" style="font-size:14px">🎉 本关任务已完成${qdone?'':',再做个测验更扎实'}</div>`:''}
+    <h2 class="sec">🧠 闯关测验</h2>
+    <div class="card" style="padding:14px">
+      <div class="row" style="justify-content:space-between">
+        <div>
+          <div style="font-size:13.5px;font-weight:700">${lv.quiz.length} 道题 · 自动判分</div>
+          <div class="muted" style="font-size:11.5px">${qdone?`已作答 · 答对 ${o.correct||0}/${lv.quiz.length}`:'答对每题 +8 XP'}</div>
+        </div>
+        <button class="btn" data-go="quiz" data-p="${lv.id}">${qdone?'重做':'开始测验'}</button>
+      </div>
+    </div>
+    <div style="height:20px"></div>
+  </div>`;
+}
+
+/* -------- 测验 -------- */
+let quizSel={}, quizSubmitted=false;
+function isCorrect(q,val){
+  if(q.type==='calc'){ const n=parseFloat(val); return !isNaN(n) && Math.abs(n-q.answer)<=(q.tol!=null?q.tol:0.01); }
+  return val===q.answer;
+}
+function viewQuiz(id){
+  const lv=LEVELS.find(l=>l.id===id); if(!lv) return `<div class="wrap"><div class="center-empty">未找到</div></div>`;
+  const qs=lv.quiz;
+  let body='';
+  qs.forEach((q,qi)=>{
+    let opts='';
+    if(q.type==='calc'){
+      const val=quizSel[qi];
+      let cls='';
+      if(quizSubmitted){ cls = isCorrect(q,val) ? 'right' : 'wrong'; }
+      opts=`<div class="calc-row ${cls}">
+        <input type="number" inputmode="decimal" step="any" data-calc="${qi}" value="${val!=null?val:''}" placeholder="填数值" ${quizSubmitted?'disabled':''}>
+        <span class="unit">${q.unit||''}</span>
+        ${quizSubmitted?`<span class="calc-ans">正确:${q.answer}${q.unit||''}</span>`:''}
+      </div>`;
+    } else {
+      const order = quizOrder[qi] || q.options.map((_,i)=>i);
+      order.forEach(oi=>{
+        const op=q.options[oi];
+        let cls='';
+        const sel=quizSel[qi];
+        if(quizSubmitted){
+          if(oi===q.answer) cls='right';
+          else if(oi===sel) cls='wrong';
+        } else if(sel===oi){ cls='sel'; }
+        opts+=`<div class="opt ${cls}" data-q="${qi}" data-o="${oi}"><span class="dot"></span><span>${op}</span></div>`;
+      });
+    }
+    const kindTag = q.type==='calc' ? '🧮 计算' : (q.kind==='logic' ? '🧠 逻辑' : '📘 概念');
+    body+=`<div class="q">
+      <div class="qt"><span class="kind">${kindTag}</span>${qi+1}. ${q.q}</div>
+      ${opts}
+      <div class="explain" id="exp-${qi}" style="${quizSubmitted?'display:block':''}">💡 ${q.explain}</div>
+    </div>`;
+  });
+  const answered=qs.filter((q,qi)=>{ const v=quizSel[qi]; return v!==undefined && v!==null && v!==''; }).length;
+  let resultHtml='';
+  if(quizSubmitted){
+    const right=qs.filter((q,qi)=>isCorrect(q,quizSel[qi])).length;
+    resultHtml=`<div class="result ${right===qs.length?'good':'bad'}">得分 ${right}/${qs.length} ${right===qs.length?'🎉 全对!':'继续加油'}</div>`;
+  }
+  return `<div class="wrap">
+    <div class="topbar">
+      <button class="back" id="backBtn">‹</button>
+      <div><div class="tt">Lv${lv.id} 闯关测验</div><div class="ts">答对每题 +8 XP · 错题自动进错题本</div></div>
+    </div>
+    ${resultHtml}
+    ${body}
+    ${quizSubmitted
+      ? `<button class="btn wide" id="quizAgain">再做一次</button>`
+      : `<button class="btn wide" id="quizSubmit" ${answered<qs.length?'disabled':''}>交卷判分 (${answered}/${qs.length})</button>`}
+    <div style="height:20px"></div>
+  </div>`;
+}
+
+/* -------- 错题本 -------- */
+function viewWrong(){
+  const keys=Object.keys(state.wrong);
+  if(!keys.length) return `<div class="wrap"><div class="center-empty"><span class="ic">✨</span>错题本是空的<br><span style="font-size:12px">做测验答错的题会自动收进来</span></div></div>`;
+  let html=`<div class="wrap"><h2 class="sec" style="margin-top:6px">错题本 · ${keys.length} 题</h2>`;
+  keys.forEach(k=>{
+    const w=state.wrong[k];
+    html+=`<div class="wrongitem">
+      <div class="q"><div class="qt" style="font-size:13.5px">${w.q}</div>
+      <div class="ans"><span class="no">你填/选:${w.type==='calc' ? ((w.chosen===undefined||w.chosen==='')?'(空)':w.chosen+(w.unit||'')) : w.options[w.chosen]}</span></div>
+      <div class="ans"><span class="ok">正确:${w.type==='calc' ? (w.answer+(w.unit||'')) : w.options[w.answer]}</span></div>
+      <div class="explain" style="display:block">💡 ${w.explain}</div>
+      <button class="btn ghost" style="margin-top:8px;padding:7px 14px;font-size:12px" data-master="${k}">✓ 已掌握,移出</button>
+      </div></div>`;
+  });
+  html+=`</div>`;
+  return html;
+}
+
+/* -------- 记录 -------- */
+function viewRecords(){
+  const xp=totalXP();
+  // 打卡日历:近 35 天
+  const days=state.checkin.days||[];
+  const set=new Set(days);
+  let cal='';
+  const today=new Date(); today.setHours(0,0,0,0);
+  for(let i=34;i>=0;i--){
+    const d=new Date(today); d.setDate(today.getDate()-i);
+    const iso=d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    const on=set.has(iso); const isToday=i===0;
+    cal+=`<div class="d ${on?'on':''} ${isToday?'today':''}">${d.getDate()}</div>`;
+  }
+  // 经验分布
+  let xprows='';
+  LEVELS.forEach(lv=>{
+    const got=lv.tasks.filter((t,i)=>state.done[`L${lv.id}-${i}`]).reduce((a,t)=>a+t.xp,0);
+    const total=lv.tasks.reduce((a,t)=>a+t.xp,0);
+    xprows+=`<div class="xprow"><span class="name">Lv${lv.id} ${lv.title}</span>
+      <div class="mini-bar" style="width:90px"><i style="width:${got/total*100}%"></i></div>
+      <span class="muted" style="width:66px;text-align:right">${got}/${total}</span></div>`;
+  });
+  // 成就
+  let ach='';
+  ACHIEVEMENTS.forEach(a=>{
+    const got=a.test(state);
+    ach+=`<div class="ach ${got?'got':''}"><div class="ai">${a.ic}</div>
+      <div><div class="an">${a.name}</div><div class="ad">${a.desc}</div></div></div>`;
+  });
+  return `<div class="wrap">
+    <h2 class="sec" style="margin-top:6px">📊 我的成长</h2>
+    <div class="hero" style="padding:16px">
+      <div class="stat-grid" style="margin-top:0">
+        <div class="stat"><b>${xp}</b><span>总经验值</span></div>
+        <div class="stat"><b>${passedCount()}</b><span>通关数</span></div>
+        <div class="stat"><b>${state.checkin.streak||0}</b><span>连续打卡</span></div>
+      </div>
+      <div class="stat-grid" style="margin-top:8px">
+        <div class="stat"><b>${correctCount()}</b><span>答对题数</span></div>
+        <div class="stat"><b>${Object.keys(state.wrong).length}</b><span>错题本</span></div>
+        <div class="stat"><b>${(state.checkin.days||[]).length}</b><span>累计学习</span></div>
+      </div>
+    </div>
+    <h2 class="sec">🗓️ 打卡日历(近 35 天)</h2>
+    <div class="card" style="padding:12px"><div class="cal">${cal}</div></div>
+    <h2 class="sec">📈 各关经验</h2>
+    <div class="card" style="padding:8px 14px">${xprows}</div>
+    <h2 class="sec">🏅 成就</h2>
+    <div class="card" style="padding:6px 14px">${ach}</div>
+    <div style="height:20px"></div>
+  </div>`;
+}
+
+/* ==================== 知识库 ==================== */
+let kbQuery='';
+function esc(s){ return String(s).replace(/[&<>"]/g, c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+function allKbItems(){ const out=[]; KNOWLEDGE.forEach(c=> c.items.forEach(it=> out.push({cat:c, it}))); return out; }
+function kbMatch(it, q){ q=q.trim().toLowerCase(); if(!q) return true; return (it.t+' '+(it.kw||'')+' '+it.body).toLowerCase().includes(q); }
+function kbRow(it, c){
+  return `<div class="kbrow" data-go="article" data-p="${it.id}">
+    <div class="kbt">${it.t}</div>
+    <div class="kbc">${c.name}</div>
+  </div>`;
+}
+function kbBody(){
+  const q=kbQuery, flat=allKbItems();
+  if(q.trim()){
+    const hits=flat.filter(x=>kbMatch(x.it,q));
+    return hits.length ? hits.map(x=>kbRow(x.it,x.cat)).join('')
+      : `<div class="center-empty"><span class="ic">🔍</span>没找到「${esc(q)}」相关内容</div>`;
+  }
+  let b='';
+  KNOWLEDGE.forEach(c=>{
+    b += `<h2 class="sec">${c.icon} ${c.name}</h2><div class="card" style="padding:4px 16px">` + c.items.map(it=>kbRow(it,c)).join('') + `</div>`;
+  });
+  return b;
+}
+function viewKnowledge(){
+  const total=allKbItems().length;
+  return `<div class="wrap">
+    <h2 class="sec" style="margin-top:6px">📚 知识库 · 共 ${total} 条</h2>
+    <div class="kbsearch">
+      <span>🔍</span>
+      <input id="kbSearch" placeholder="搜索:星三角 / Modbus / 线径…" value="${esc(kbQuery)}">
+      <button id="kbClear">✕</button>
+    </div>
+    <div id="kbList" style="margin-top:12px">${kbBody()}</div>
+  </div>`;
+}
+function refreshKbList(){
+  const list=document.getElementById('kbList'); if(!list) return;
+  list.innerHTML=kbBody(); bindGo(list);
+}
+function viewArticle(id){
+  let found=null;
+  KNOWLEDGE.forEach(c=> c.items.forEach(it=>{ if(it.id===id) found={cat:c, it}; }));
+  if(!found) return `<div class="wrap"><div class="center-empty">未找到</div></div>`;
+  return `<div class="wrap">
+    <div class="topbar">
+      <button class="back" id="backBtn">‹</button>
+      <div><div class="tt">${found.it.t}</div><div class="ts">${found.cat.icon} ${found.cat.name}</div></div>
+    </div>
+    <div class="teach" style="margin-top:6px">${teachHtml(found.it.body)}</div>
+    <div style="height:20px"></div>
+  </div>`;
+}
+function bindGo(scope){
+  scope.querySelectorAll('[data-go]').forEach(el=>{
+    el.addEventListener('click', e=>{ e.stopPropagation(); go(el.dataset.go, Number(el.dataset.p)||el.dataset.p); });
+  });
+}
+
+/* ==================== 事件绑定 ==================== */
+function wire(){
+  // 通用跳转
+  bindGo(document);
+  renderDiagrams();
+  // 配色
+  document.querySelectorAll('[data-pal]').forEach(el=>{
+    el.addEventListener('click', ()=>{ state.settings.palette=el.dataset.pal; applyPalette(); save(); render(); });
+  });
+  // 知识库搜索
+  const kb=document.getElementById('kbSearch');
+  if(kb){
+    kb.addEventListener('input', ()=>{ kbQuery=kb.value; refreshKbList(); });
+    const kc=document.getElementById('kbClear');
+    if(kc) kc.addEventListener('click', ()=>{ kbQuery=''; kb.value=''; kb.focus(); refreshKbList(); });
+  }
+  const back=document.getElementById('backBtn');
+  if(back) back.addEventListener('click', ()=> go(view==='quiz'?'detail':(view==='article'?'kb':'map'), viewParam));
+
+  // 任务点击
+  document.querySelectorAll('[data-task]').forEach(el=>{
+    el.addEventListener('click', ()=>{
+      const lv=LEVELS.find(l=>l.id===viewParam);
+      const i=Number(el.dataset.task);
+      const key=`L${lv.id}-${i}`;
+      const was=!!state.done[key];
+      if(was) delete state.done[key]; else state.done[key]=true;
+      const nowDone=levelDone(lv);
+      save();
+      if(!was){ sfxTask(); }
+      render();
+      if(!was && nowDone) setTimeout(()=> toast(`🏅 通关「${lv.title}」!`), 400);
+    });
+  });
+
+  // 打卡
+  const ci=document.getElementById('checkinBtn');
+  if(ci) ci.addEventListener('click', doCheckin);
+
+  // 设置
+  const th=document.getElementById('toggleTheme');
+  if(th) th.addEventListener('change', ()=>{ state.settings.theme = th.checked?'dark':'light'; applyTheme(); save(); });
+  const ts=document.getElementById('toggleSound');
+  if(ts) ts.addEventListener('change', ()=>{ state.settings.sound=ts.checked; save(); if(ts.checked) sfxTask(); });
+  const tr=document.getElementById('toggleRemind');
+  if(tr) tr.addEventListener('change', ()=> setRemind(tr.checked));
+
+  // 存档
+  const ex=document.getElementById('exportBtn');
+  if(ex) ex.addEventListener('click', doExport);
+  const im=document.getElementById('importBtn');
+  if(im) im.addEventListener('click', ()=> document.getElementById('fileInput').click());
+  const fi=document.getElementById('fileInput');
+  if(fi) fi.addEventListener('change', doImport);
+  const rs=document.getElementById('resetBtn');
+  if(rs) rs.addEventListener('click', ()=>{
+    if(confirm('确定清空所有进度?')){ state=load0(); save(); render(); toast('已重置'); }
+  });
+
+  // 测验选项
+  document.querySelectorAll('[data-q]').forEach(el=>{
+    if(quizSubmitted) return;
+    el.addEventListener('click', ()=>{
+      const qi=Number(el.dataset.q), oi=Number(el.dataset.o);
+      quizSel[qi]=oi;
+      render();
+    });
+  });
+  // 计算题输入（不重绘，避免丢焦点）
+  document.querySelectorAll('[data-calc]').forEach(inp=>{
+    if(quizSubmitted) return;
+    inp.addEventListener('input', ()=>{
+      quizSel[Number(inp.dataset.calc)]=inp.value;
+      updateQuizStatus();
+    });
+  });
+  const qsub=document.getElementById('quizSubmit');
+  if(qsub) qsub.addEventListener('click', submitQuiz);
+  const qagain=document.getElementById('quizAgain');
+  if(qagain) qagain.addEventListener('click', ()=>{ quizSel={}; quizSubmitted=false; refreshQuizOrder(viewParam); render(); });
+
+  // 错题移出
+  document.querySelectorAll('[data-master]').forEach(el=>{
+    el.addEventListener('click', ()=>{ delete state.wrong[el.dataset.master]; save(); render(); toast('已移出错题本'); });
+  });
+}
+
+/* ==================== 行为 ==================== */
+function load0(){ return { done:{}, quiz:{}, wrong:{}, checkin:{last:null, streak:0, days:[]}, settings:state.settings, rankIdx:0 }; }
+
+function doCheckin(){
+  const t=todayISO();
+  if(state.checkin.last===t) return;
+  const gap=state.checkin.last?daysBetween(state.checkin.last,t):null;
+  state.checkin.streak = (gap===1)? (state.checkin.streak+1) : 1;
+  state.checkin.last=t;
+  if(!state.checkin.days) state.checkin.days=[];
+  if(!state.checkin.days.includes(t)) state.checkin.days.push(t);
+  save(); render();
+  toast(`🔥 打卡成功!连续 ${state.checkin.streak} 天`);
+}
+
+function setRemind(on){
+  if(!on){ state.settings.remind=false; save(); render(); return; }
+  if(!('Notification' in window)){ toast('此浏览器不支持通知'); render(); return; }
+  Notification.requestPermission().then(p=>{
+    if(p==='granted'){ state.settings.remind=true; save(); toast('已开启提醒(页面打开时生效)'); }
+    else toast('未授权通知,无法提醒');
+    render();
+  });
+}
+
+function updateQuizStatus(){
+  const lv=LEVELS.find(l=>l.id===viewParam); if(!lv) return;
+  const answered=lv.quiz.filter((q,qi)=>{ const v=quizSel[qi]; return v!==undefined && v!=='' && v!==null; }).length;
+  const btn=document.getElementById('quizSubmit');
+  if(btn){ btn.disabled=answered<lv.quiz.length; btn.textContent=`交卷判分 (${answered}/${lv.quiz.length})`; }
+}
+
+function submitQuiz(){
+  const lv=LEVELS.find(l=>l.id===viewParam);
+  const qs=lv.quiz;
+  const before=rankIndex(totalXP());
+  quizSubmitted=true;
+  let correct=0;
+  qs.forEach((q,qi)=>{
+    const chosen=quizSel[qi];
+    const k=`L${lv.id}Q${qi}`;
+    if(isCorrect(q,chosen)){ correct++; if(state.wrong[k]) delete state.wrong[k]; }
+    else { state.wrong[k]={ q:q.q, type:q.type||'choice', options:q.options, answer:q.answer, unit:q.unit, chosen, explain:q.explain, lv:lv.id }; }
+  });
+  state.quiz[lv.id]={ attempted: qs.length, correct: correct };
+  save(); render();
+  const after=rankIndex(totalXP());
+  if(after>before){ showLevelUp(after); } else { toast(correct===qs.length?'🎉 全对!'+` +${correct*8}XP`:`答对 ${correct}/${qs.length}`); }
+}
+
+function showLevelUp(idx){
+  sfxLevel();
+  const r=RANKS[idx];
+  const el=document.getElementById('levelup');
+  el.innerHTML=`<div class="box">
+    <div class="big">${r.icon}</div>
+    <div class="up1">境 界 提 升</div>
+    <div class="up2">${r.name}</div>
+    <div class="up3">累计 ${totalXP()} XP · 继续加油!</div>
+    <button class="btn" id="luClose">太棒了</button>
+  </div>`;
+  el.classList.add('show');
+  state.rankIdx=idx; save();
+  document.getElementById('luClose').addEventListener('click', ()=> el.classList.remove('show'));
+}
+
+function doExport(){
+  const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob); a.download=`电气养成存档_${todayISO()}.json`; a.click();
+  URL.revokeObjectURL(a.href); toast('已导出存档');
+}
+function doImport(e){
+  const f=e.target.files[0]; if(!f) return;
+  const r=new FileReader();
+  r.onload=()=>{ try{ const o=JSON.parse(r.result); if(!o.done) throw 0;
+    state=o; if(!state.wrong) state.wrong={}; if(!state.quiz) state.quiz={};
+    if(!state.checkin) state.checkin={last:null,streak:0,days:[]}; if(!state.settings) state.settings={sound:true,remind:false,theme:'light'}; if(!state.settings.theme) state.settings.theme='light'; if(!state.settings.palette) state.settings.palette='blue';
+    save(); render(); toast('存档导入成功 ✓'); }catch(err){ toast('❌ 存档无效'); } };
+  r.readAsText(f); e.target.value='';
+}
+
+/* ==================== Toast ==================== */
+let toastTimer;
+function toast(msg){
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.classList.add('show');
+  clearTimeout(toastTimer); toastTimer=setTimeout(()=> el.classList.remove('show'),1900);
+}
+
+/* ==================== 每日提醒调度 ==================== */
+function scheduleReminder(){
+  if(!state.settings.remind) return;
+  if(state.checkin.last===todayISO()) return;
+  if(document.hidden) return;
+  if(Notification.permission==='granted'){
+    const last=sessionStorage.getItem('ee_remind')||'';
+    if(last!==todayISO()){
+      new Notification('⚡ 电气工程师养成',{ body:'今天还没打卡,学 10 分钟也能涨经验!' });
+      sessionStorage.setItem('ee_remind', todayISO());
+    }
+  }
+}
+setInterval(scheduleReminder, 60000);
+
+/* ==================== 启动 ==================== */
+applyTheme();
+render();
+</script>
+</body>
+</html>
